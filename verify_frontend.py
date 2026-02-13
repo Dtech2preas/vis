@@ -1,80 +1,49 @@
-
-import os
-import time
 from playwright.sync_api import sync_playwright
+import time
 
-def run(playwright):
-    browser = playwright.chromium.launch(headless=True)
-    context = browser.new_context()
-    page = context.new_page()
+def run():
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
 
-    # 1. Load Index
-    print("Navigating to index.html...")
-    page.goto("http://localhost:8080/index.html")
+        # 1. Index Page - Stats Tab
+        page.goto("http://localhost:8080/index.html")
 
-    # 2. Verify Valentine Modal
-    print("Checking Valentine Modal...")
-    try:
-        page.wait_for_selector("#valentineModal", state="visible", timeout=5000)
-        page.screenshot(path="valentine_modal.png")
-        print("Valentine Modal visible. Screenshot taken.")
-
-        # 3. Close Modal
-        print("Closing modal...")
-        page.click("button.v-btn")
-        page.wait_for_selector("#valentineModal", state="hidden")
-    except:
-        print("Valentine modal did not appear (maybe already shown?). Clearing storage and retrying.")
-        page.evaluate("localStorage.clear()")
-        page.reload()
-        page.wait_for_selector("#valentineModal", state="visible")
-        page.click("button.v-btn")
-
-    # 4. Wait for Books (wait for loading to finish)
-    print("Waiting for books to load...")
-    try:
-        # Wait for loading indicator to disappear implies loading is done
-        page.wait_for_selector("#loadingProgress", state="hidden", timeout=30000)
-        page.wait_for_selector(".book-card", timeout=5000)
-        print("Books loaded and stable.")
-    except Exception as e:
-        print(f"Books load issue: {e}")
-        page.screenshot(path="index_debug.png")
-        # Force a book if needed
+        # Inject some stats AND prevent valentine modal
         page.evaluate("""
-            const b = {title:'Test Book', textUrl:'https://www.gutenberg.org/files/11/11-0.txt', author:'Lewis Carroll', cover:''};
-            books = [b];
-            renderHomePage(books);
+            localStorage.setItem('gutenberg:stats', JSON.stringify({
+                totalTime: 3665,
+                pagesTurned: 42
+            }));
+            localStorage.setItem('gutenberg:lastpage:testbook', '10');
+            localStorage.setItem('owami_valentine_shown', 'true');
         """)
-        page.wait_for_selector(".book-card")
 
-    # 5. Click a Book
-    print("Clicking first book...")
-    # Add a small delay to ensure event listeners are attached
-    time.sleep(1)
-    page.click(".book-card >> nth=0")
+        page.reload()
+        page.click('#tab-stats')
+        time.sleep(1)
+        page.screenshot(path="index_stats.png")
 
-    # 6. Verify Navigation to Reader
-    print("Waiting for navigation to reader.html...")
-    page.wait_for_url("**/reader.html*")
+        # 2. Index Page - Collections Tab & Creation
+        page.click('#tab-collections')
+        time.sleep(1)
 
-    # 7. Verify Reader Elements
-    print("Verifying reader elements...")
-    page.wait_for_selector(".reader-container")
+        # Handle prompt for collection creation
+        def handle_dialog(dialog):
+            dialog.accept("My Favorites")
+        page.on("dialog", handle_dialog)
 
-    # Wait for title to populate (even if 'Loading Book...')
-    page.wait_for_selector("#bookTitle")
+        page.click("text=+ New Collection")
+        time.sleep(1)
+        page.screenshot(path="index_collections.png")
 
-    title = page.text_content("#bookTitle")
-    print(f"Reader Title: {title}")
+        # 3. Reader Page
+        # Use a dummy book url
+        page.goto("http://localhost:8080/reader.html?url=http://www.gutenberg.org/files/11/11-0.txt&title=Alice%20in%20Wonderland")
+        time.sleep(2) # wait for load
+        page.screenshot(path="reader_page.png")
 
-    # 8. Take Screenshot of Reader
-    # Wait a bit for potential layout render
-    time.sleep(1)
-    page.screenshot(path="reader_page.png")
-    print("Reader screenshot taken.")
+        browser.close()
 
-    browser.close()
-
-with sync_playwright() as playwright:
-    run(playwright)
+if __name__ == "__main__":
+    run()
