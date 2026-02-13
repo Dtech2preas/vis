@@ -1,0 +1,5 @@
+127.0.0.1 - - [13/Feb/2026 20:15:40] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [13/Feb/2026 20:15:41] "GET /data.txt HTTP/1.1" 200 -
+127.0.0.1 - - [13/Feb/2026 20:16:57] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [13/Feb/2026 20:16:57] "GET /data.txt HTTP/1.1" 200 -
+127.0.0.1 - - [13/Feb/2026 20:17:31] "GET /reader.html?url=https%3A%2F%2Fwww.gutenberg.org%2Febooks%2F52159.txt.utf-8&title=Der+Weltkrieg%2C+III.+Band%3A+Vom+Eingreifen+Amerikas+bis+zum+Zusammenbruch&author=Helfferich%2C+Karl HTTP/1.1" 200 -

@@ -6,11 +6,12 @@
 <title>Owami's Library — Dtech Collection</title>
 <style>
   :root {
-    /* DTECH X OWAMI THEME - DEFAULT DARK */
+    /* DTECH X OWAMI THEME */
     --accent: #00d4ff;        /* Tech Blue */
     --accent-light: #2979ff;  /* Light Blue */
     --accent-dark: #00a2c7;   /* Darker Blue */
     --highlight: #ff007f;     /* Owami Pink */
+    --highlight-glow: rgba(255, 0, 127, 0.4);
     --text: #e0e0e0;
     --text-light: #b0b0b0;
     --muted: #6e6e6e;
@@ -18,10 +19,7 @@
     --card-bg: #141414;       /* Dark Gray */
     --border: #333333;
 
-    --book-font: "Georgia","Times New Roman", serif;
     --ui-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --reader-font-size: 9px;
-    --page-words: 500;
   }
 
   /* Force Dark Mode Default */
@@ -34,20 +32,6 @@
     height: 100%;
   }
 
-  /* Specific Override for Light Mode if toggle is kept (but we aim for dark first) */
-  body.light-mode {
-    --accent: #0077cc;
-    --accent-light: #4da6ff;
-    --accent-dark: #005fa3;
-    --highlight: #d6006c;
-    --text: #1a1a1a;
-    --text-light: #4a4a4a;
-    --muted: #888;
-    --background: #f5f5f7;
-    --card-bg: #ffffff;
-    --border: #e0e0e0;
-  }
-
   /* SCROLLBAR */
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: var(--background); }
@@ -55,7 +39,7 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
   .topbar {
-    background: rgba(20, 20, 20, 0.8);
+    background: rgba(20, 20, 20, 0.85);
     backdrop-filter: blur(10px);
     padding: 16px 24px;
     border-bottom: 1px solid var(--border);
@@ -65,7 +49,7 @@
     position: sticky;
     top: 0;
     z-index: 30;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   }
 
   .brand {
@@ -83,7 +67,11 @@
     filter: drop-shadow(0 0 5px var(--accent));
   }
 
-  .brand-text em { color: var(--highlight); font-style: normal; }
+  .brand-text em {
+    color: var(--highlight);
+    font-style: normal;
+    text-shadow: 0 0 10px var(--highlight-glow);
+  }
 
   .dtech-badge {
     background: var(--accent);
@@ -225,18 +213,11 @@
     letter-spacing: -0.5px;
   }
 
-  .section-title:before {
-    font-size: 24px;
-    filter: grayscale(100%); /* Desaturate icons for cleaner look */
-  }
+  /* Pink accent on section titles */
+  .section-title span { color: var(--highlight); margin-left: auto; font-size: 14px; opacity: 0.8; font-weight: normal; }
 
   /* HOME */
-  #homeSection {
-    background: transparent;
-    padding: 0;
-    border: none;
-    box-shadow: none;
-  }
+  #homeSection { background: transparent; padding: 0; border: none; box-shadow: none; }
 
   .genre-section {
     margin-bottom: 30px;
@@ -300,7 +281,7 @@
     border-color: var(--accent);
   }
 
-  /* Highlight bar */
+  /* Highlight bar - Pink Gradient */
   .book-card:before {
     content: "";
     position: absolute;
@@ -309,7 +290,7 @@
     right: 0;
     height: 2px;
     background: linear-gradient(90deg, var(--accent), var(--highlight));
-    opacity: 0.7;
+    opacity: 0.8;
   }
 
   .cover-wrap {
@@ -414,6 +395,7 @@
     background: #222;
     color: var(--highlight);
     border-color: var(--highlight);
+    box-shadow: 0 0 8px var(--highlight-glow);
   }
 
   .load-more-btn, .load-more-genres-btn {
@@ -533,93 +515,63 @@
     border-color: #ff4444;
   }
 
-  /* READER FULLSCREEN */
-  .reader-fullscreen {
-    background: #050505;
-    color: #ccc;
-  }
-
-  /* Reader Theme Overrides */
-  .reader-fullscreen.theme-light { --reader-bg: #f0f0f0; --reader-text: #111; --page-bg: #fff; }
-  .reader-fullscreen.theme-sepia { --reader-bg: #f4ecd8; --reader-text: #5b4636; --page-bg: #fdfaf6; }
-  .reader-fullscreen.theme-dark { --reader-bg: #050505; --reader-text: #b0b0b0; --page-bg: #141414; }
-
-  .reader-header {
-    height: 60px;
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 0 20px;
-  }
-
-  .reader-title {
-    font-family: var(--ui-font);
-    font-size: 14px;
-    color: var(--text-light);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  .reader-back-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--accent);
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
+  /* VALENTINE MODAL */
+  .valentine-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 100;
     display: flex;
     align-items: center;
-    gap: 6px;
-    transition: all 0.2s;
+    justify-content: center;
+    backdrop-filter: blur(5px);
   }
 
-  .reader-back-btn:hover {
-    background: rgba(0, 212, 255, 0.1);
-    border-color: var(--accent);
+  .valentine-card {
+    background: #1a0a10; /* Very dark pinkish black */
+    border: 2px solid var(--highlight);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 0 50px rgba(255, 0, 127, 0.3);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  .page {
-    border: 1px solid #222;
-    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+  @keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
   }
 
-  .reader-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-bottom: 20px;
-    width: 80%;
-    max-width: 600px;
+  .v-title {
+    font-size: 28px;
+    color: var(--highlight);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--highlight-glow);
   }
 
-  .reader-progress-bar {
-    width: 100%;
-    height: 4px;
-    background: #333;
-    border-radius: 2px;
-    overflow: hidden;
+  .v-msg {
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
   }
 
-  .reader-progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--highlight); /* Her dash of pink */
-    box-shadow: 0 0 10px var(--highlight);
-    transition: width 0.3s ease;
+  .v-btn {
+    background: var(--highlight);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 20px var(--highlight-glow);
   }
-
-  .page-indicator {
-    background: rgba(0,0,0,0.8);
-    border: 1px solid #333;
-    color: var(--accent);
-    font-family: monospace;
-  }
-
-  .nav-arrow {
-    background: rgba(0,0,0,0.8);
-    color: var(--accent);
-    border: 1px solid #333;
-  }
+  .v-btn:hover { transform: scale(1.05); background: #ff3399; }
 
   /* Toast */
   .toast {
@@ -627,6 +579,7 @@
     color: var(--accent);
     border: 1px solid var(--accent);
     box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+    position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 8px; z-index: 1000;
   }
 
   /* Bottom Nav for Mobile */
@@ -763,106 +716,41 @@
   </div>
 </div>
 
-<!-- Reader fullscreen -->
-<div class="reader-fullscreen" id="reader">
-  <div class="reader-header">
-    <button id="readerBackBtn" class="reader-back-btn">◀ Library</button>
-    <div class="reader-title" id="readerTitle">Loading...</div>
-    <button id="readerSettingsToggle" class="reader-settings-btn" aria-label="Reader Settings">⚙️</button>
-  </div>
-
-  <div id="readerSettingsPanel" class="settings-panel" style="display:none">
-    <div class="settings-row">
-      <span class="settings-label">Theme</span>
-      <div class="settings-options">
-        <button class="settings-btn" data-theme="light">Light</button>
-        <button class="settings-btn" data-theme="sepia">Sepia</button>
-        <button class="settings-btn" data-theme="dark">Dark</button>
-      </div>
+<!-- Valentine's Modal -->
+<div id="valentineModal" class="valentine-modal" style="display:none">
+  <div class="valentine-card">
+    <div class="v-title">Happy Valentine's Day!</div>
+    <div class="v-msg">
+      To my amazing girlfriend Owami,<br><br>
+      I built this library just for you, so you can escape into stories whenever you wish.
+      I hope you love reading here as much as I love you.<br><br>
+      Forever yours, <br><em>Dtech</em>
     </div>
-    <div class="settings-row">
-      <span class="settings-label">Font Family</span>
-      <div class="settings-options">
-        <button class="settings-btn" data-font="serif">Serif</button>
-        <button class="settings-btn" data-font="sans">Sans</button>
-        <button class="settings-btn" data-font="mono">Mono</button>
-      </div>
-    </div>
-    <div class="settings-row">
-      <span class="settings-label">Font Size</span>
-      <div class="settings-options">
-        <button class="settings-btn" id="fontDec">-</button>
-        <button class="settings-btn" id="fontInc">+</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="reader-body">
-    <div class="page-container" id="pageContainer">
-      <div class="page">
-        <div class="page-content" id="pageContent">Loading...</div>
-      </div>
-    </div>
-
-    <div class="nav-hit-left" id="navLeft">
-      <div class="nav-arrow nav-arrow-left">◀</div>
-    </div>
-    <div class="nav-hit-right" id="navRight">
-      <div class="nav-arrow nav-arrow-right">▶</div>
-    </div>
-
-    <div class="reader-footer" id="readerFooter">
-      <div class="reader-progress-bar">
-        <div class="reader-progress-fill" id="readerProgressFill"></div>
-      </div>
-      <div class="page-indicator" id="pageIndicator">Page 1 / 1</div>
-    </div>
+    <button class="v-btn" onclick="closeValentine()">Enter Library</button>
   </div>
 </div>
 
 <script>
-/* CONFIG - EASILY EDITABLE VALUES */
-const PROXY_URL = "https://silent-brook-9ad3.dtech2j.workers.dev/"; // your Worker
-const PROXY_KEY = "dtech_secret";
-const WORDS_PER_PAGE_DEFAULT = 500;         // Change this value to adjust words per page
-const MIN_BALANCE_RATIO = 0.40;             // minimum fraction for last page before rebalancing
-const FONT_SIZE_DEFAULT = 9;                // Change this value to adjust font size
-const BOOKS_PER_GENRE = 10;                 // Number of books to show per genre initially
-const GENRES_PER_LOAD = 5;                  // Number of genres to show initially (reduced for faster loading)
-const GENRES_PER_FILTER = 40;               // Number of genres to show in filter dropdown
-const CHUNK_SIZE = 5000;                    // Size of data chunks to process at once
-
-/* INDEXEDDB CONFIG */
+/* CONFIG */
+const BOOKS_PER_GENRE = 10;
+const GENRES_PER_LOAD = 5;
+const GENRES_PER_FILTER = 40;
+const CHUNK_SIZE = 5000;
 const DB_NAME = 'GutenbergLibDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'books';
 
 /* STATE */
 let books = [];
-let pages = [];            // current pages (HTML strings)
-let currentPage = 0;
-let currentBook = null;    // {title, textUrl, cover, author}
-let wordsPerPage = WORDS_PER_PAGE_DEFAULT;
-let fontSize = FONT_SIZE_DEFAULT;
-let readerTheme = 'sepia';
-let readerFont = 'serif';
-let pageIndicatorTimeout;
-let genreDisplayCounts = {}; // Track how many books are shown per genre
-let genresToShow = GENRES_PER_LOAD; // Track how many genres to display
-let rawData = ""; // Store the raw data for lazy parsing
-let processedData = ""; // Store already processed data
-let searchIndex = {}; // Store search index for faster searching
-let isProcessing = false; // Track if we're currently processing data
+let genreDisplayCounts = {};
+let genresToShow = GENRES_PER_LOAD;
+let rawData = "";
+let processedData = "";
+let isProcessing = false;
 
 /* UI refs */
-const booksGrid = document.getElementById('booksGrid');
 const homeContent = document.getElementById('homeContent');
 const statsEl = document.getElementById('stats');
-const pageContent = document.getElementById('pageContent');
-const pageIndicator = document.getElementById('pageIndicator');
-const readerEl = document.getElementById('reader');
-const readerTitle = document.getElementById('readerTitle');
-const readerFooter = document.getElementById('readerFooter');
 const loadMoreGenresBtn = document.getElementById('loadMoreGenres');
 const loadingProgress = document.getElementById('loadingProgress');
 const progressFill = document.getElementById('progressFill');
@@ -960,8 +848,26 @@ function switchTab(id){
 /* load data.txt and parse */
 window.addEventListener('load', () => {
   loadBooks(false);
-  loadReaderSettings();
+  checkValentine();
 });
+
+/* Valentine's Logic */
+function checkValentine() {
+  const shown = localStorage.getItem('owami_valentine_shown');
+  if (!shown) {
+    document.getElementById('valentineModal').style.display = 'flex';
+  }
+}
+
+function closeValentine() {
+  const modal = document.getElementById('valentineModal');
+  modal.style.transition = 'opacity 0.5s';
+  modal.style.opacity = '0';
+  setTimeout(() => {
+    modal.style.display = 'none';
+    localStorage.setItem('owami_valentine_shown', 'true');
+  }, 500);
+}
 
 /* INDEXEDDB FUNCTIONS */
 function openDB() {
@@ -1000,17 +906,6 @@ async function addBooksToDB(booksToAdd) {
     };
     transaction.oncomplete = () => resolve();
     transaction.onerror = event => reject('Error adding books to DB: ' + event.target.error);
-  });
-}
-
-async function clearBooksDB() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.clear();
-    request.onsuccess = () => resolve();
-    request.onerror = event => reject('Error clearing DB: ' + event.target.error);
   });
 }
 
@@ -1097,40 +992,30 @@ function processDataChunk(saveToDB = false) {
   if (isProcessing) return;
   isProcessing = true;
   
-  // If we have no processed data yet, start from the beginning
-  if (processedData === "") {
-    processedData = rawData;
-  }
+  if (processedData === "") processedData = rawData;
   
-  // Process a chunk of data, careful not to split lines
   let chunkEnd = Math.min(CHUNK_SIZE, processedData.length);
   if (chunkEnd < processedData.length) {
     const lastNewline = processedData.lastIndexOf('\n', chunkEnd);
-    if (lastNewline > 0) {
-      chunkEnd = lastNewline + 1;
-    }
+    if (lastNewline > 0) chunkEnd = lastNewline + 1;
   }
 
   const chunkToProcess = processedData.substring(0, chunkEnd);
   const remainingData = processedData.substring(chunkEnd);
   
-  // Parse the chunk, appending to existing books
   parseDataChunk(chunkToProcess, true);
   
-  // Update progress
   const progressPercent = 50 + (50 * (rawData.length - remainingData.length) / rawData.length);
   progressFill.style.width = `${progressPercent}%`;
   progressText.textContent = `Processing data... ${Math.round(progressPercent)}%`;
   
-  // If there's more data to process, schedule next chunk
   if (remainingData.length > 0) {
     processedData = remainingData;
     setTimeout(() => {
       isProcessing = false;
       processDataChunk(saveToDB);
-    }, 10); // Small delay to allow UI updates
+    }, 10);
   } else {
-    // Finished processing
     loadingProgress.style.display = 'none';
     isProcessing = false;
     statsEl.innerHTML = `📚 ${books.length} books loaded • Use search/genre <button onclick="loadBooks(true)" class="small-btn" style="margin-left:10px">Refresh Data</button>`;
@@ -1139,7 +1024,6 @@ function processDataChunk(saveToDB = false) {
       addBooksToDB(books).then(() => console.log('Books saved to DB')).catch(e => console.error(e));
     }
     
-    // Show/hide load more genres button
     const totalGenres = countGenresInData(rawData);
     if (totalGenres > genresToShow) {
       loadMoreGenresBtn.style.display = 'block';
@@ -1165,11 +1049,7 @@ function parseDataChunk(chunk, append = false) {
       const m = line.match(/🎯\s*GENRE:\s*([^\(]+)/i);
       currentGenre = m ? m[1].trim() : currentGenre;
       genreCount++;
-      
-      // If we've reached our genre limit, stop parsing
-      if (genreCount > genresToShow) {
-        break;
-      }
+      if (genreCount > genresToShow) break;
       continue;
     }
     const bs = line.match(/^📖\s*BOOK\s*\d+\s*:\s*(.+)$/i);
@@ -1177,11 +1057,7 @@ function parseDataChunk(chunk, append = false) {
       if (currentBook) {
         parsed.push(currentBook);
         bookCount++;
-        
-        // If we've reached our book limit, stop parsing
-        if (bookCount >= BOOKS_PER_GENRE * genresToShow) {
-          break;
-        }
+        if (bookCount >= BOOKS_PER_GENRE * genresToShow) break;
       }
       currentBook = { genre: currentGenre, title: bs[1].trim() };
       continue;
@@ -1190,7 +1066,6 @@ function parseDataChunk(chunk, append = false) {
     if (line.includes('👤 Author:')) currentBook.author = line.split('👤 Author:')[1].trim();
     else if (line.includes('📝 Text URL:')) currentBook.textUrl = line.split('📝 Text URL:')[1].trim();
     else if (line.includes('🖼️  Cover:') || line.includes('🖼️ Cover:')) {
-      // Extract cover URL correctly
       const coverMatch = line.match(/🖼️\s*Cover:\s*(.+)/i);
       if (coverMatch) currentBook.cover = coverMatch[1].trim();
     }
@@ -1198,51 +1073,35 @@ function parseDataChunk(chunk, append = false) {
       parsed.push(currentBook); 
       bookCount++;
       currentBook = null; 
-      
-      // If we've reached our book limit, stop parsing
-      if (bookCount >= BOOKS_PER_GENRE * genresToShow) {
-        break;
-      }
+      if (bookCount >= BOOKS_PER_GENRE * genresToShow) break;
     }
   }
   if (currentBook) parsed.push(currentBook);
 
-  // If we're appending to existing books
-  if (append) {
-    books = books.concat(parsed);
-  } else {
-    books = parsed;
-  }
+  if (append) books = books.concat(parsed);
+  else books = parsed;
 
   renderHomePage();
   populateGenreFilter();
   renderContinueList();
 }
 
-/* Count total genres in the data file */
 function countGenresInData(text) {
   const lines = text.split(/\r?\n/);
   let genreCount = 0;
-  
   for (let raw of lines){
-    const line = raw.trim();
-    if (line.includes('🎯 GENRE:')) {
-      genreCount++;
-    }
+    if (raw.trim().includes('🎯 GENRE:')) genreCount++;
   }
-  
   return genreCount;
 }
 
-/* Load more genres */
 loadMoreGenresBtn.addEventListener('click', () => {
   genresToShow += GENRES_PER_LOAD;
-  processedData = rawData; // Reset to process from beginning with new limit
-  books = []; // Clear books to rebuild with new limit
+  processedData = rawData;
+  books = [];
   processDataChunk(false);
 });
 
-/* Render home page with genre sections */
 function renderHomePage(list=books){
   homeContent.innerHTML = '';
   if (!list.length) { 
@@ -1250,28 +1109,18 @@ function renderHomePage(list=books){
     return; 
   }
   
-  // Group books by genre
   const booksByGenre = {};
   list.forEach(book => {
-    if (!booksByGenre[book.genre]) {
-      booksByGenre[book.genre] = [];
-    }
+    if (!booksByGenre[book.genre]) booksByGenre[book.genre] = [];
     booksByGenre[book.genre].push(book);
   });
   
-  // Initialize display counts if not set
   Object.keys(booksByGenre).forEach(genre => {
-    if (!genreDisplayCounts[genre]) {
-      genreDisplayCounts[genre] = BOOKS_PER_GENRE;
-    }
+    if (!genreDisplayCounts[genre]) genreDisplayCounts[genre] = BOOKS_PER_GENRE;
   });
   
-  // Sort genres by number of books (most to least)
-  const sortedGenres = Object.keys(booksByGenre).sort((a, b) => {
-    return booksByGenre[b].length - booksByGenre[a].length;
-  });
+  const sortedGenres = Object.keys(booksByGenre).sort((a, b) => booksByGenre[b].length - booksByGenre[a].length);
   
-  // Create sections for each genre
   sortedGenres.forEach(genre => {
     const genreBooks = booksByGenre[genre];
     const displayCount = genreDisplayCounts[genre];
@@ -1305,7 +1154,6 @@ function renderHomePage(list=books){
     
     genreSection.appendChild(booksGrid);
     
-    // Add "Load More" button if there are more books to show
     if (displayCount < genreBooks.length) {
       const loadMoreBtn = document.createElement('button');
       loadMoreBtn.className = 'load-more-btn';
@@ -1321,7 +1169,6 @@ function renderHomePage(list=books){
   });
 }
 
-/* Create book card for home page */
 function createBookCard(book) {
   const card = document.createElement('div'); 
   card.className='book-card';
@@ -1368,7 +1215,6 @@ function createBookCard(book) {
   const favBtn = document.createElement('button');
   favBtn.className='small-btn';
   favBtn.innerHTML = isInFavorites(book.textUrl) ? '❤️' : '🤍';
-  favBtn.title = 'Toggle Favorite';
   favBtn.addEventListener('click', (e)=>{
     e.stopPropagation();
     toggleFavorite(book);
@@ -1384,40 +1230,28 @@ function createBookCard(book) {
   card.appendChild(genre); 
   card.appendChild(row);
   
-  // Clicking card reads
   card.addEventListener('click', ()=> openBook(book));
   
   return card;
 }
 
-/* helper short title */
 function shortTitle(t){
   if (!t) return 'No title';
   return t.split(' ').slice(0,3).join(' ');
 }
 
-/* Genre filter / search */
 function populateGenreFilter(){
   const sel = document.getElementById('genreFilter'); 
   sel.innerHTML = '<option value="">All Genres</option>';
   
-  // Count books per genre
   const genreCounts = {};
   books.forEach(book => {
-    if (book.genre) {
-      genreCounts[book.genre] = (genreCounts[book.genre] || 0) + 1;
-    }
+    if (book.genre) genreCounts[book.genre] = (genreCounts[book.genre] || 0) + 1;
   });
   
-  // Sort genres by count (most to least)
-  const sortedGenres = Object.keys(genreCounts).sort((a, b) => {
-    return genreCounts[b] - genreCounts[a];
-  });
-  
-  // Limit to top GENRES_PER_FILTER genres
+  const sortedGenres = Object.keys(genreCounts).sort((a, b) => genreCounts[b] - genreCounts[a]);
   const topGenres = sortedGenres.slice(0, GENRES_PER_FILTER);
   
-  // Add options with counts
   topGenres.forEach(g => { 
     const o = document.createElement('option'); 
     o.value = g; 
@@ -1426,7 +1260,6 @@ function populateGenreFilter(){
   });
 }
 
-// Debounced search function
 let searchTimeout;
 document.getElementById('searchInput').addEventListener('input', (e)=>{
   clearTimeout(searchTimeout);
@@ -1439,12 +1272,9 @@ document.getElementById('searchInput').addEventListener('input', (e)=>{
       return;
     }
     
-    // Show loading indicator for search
     loadingProgress.style.display = 'flex';
     progressFill.style.width = '0%';
     progressText.textContent = 'Searching...';
-    
-    // Process search in chunks to avoid freezing
     processSearch(q, genre);
   }, 300);
 });
@@ -1453,7 +1283,7 @@ function processSearch(query, genreFilter) {
   const filtered = [];
   let processed = 0;
   const totalBooks = books.length;
-  const chunkSize = 100; // Process 100 books at a time
+  const chunkSize = 100;
   
   function processChunk() {
     const chunkEnd = Math.min(processed + chunkSize, totalBooks);
@@ -1468,105 +1298,54 @@ function processSearch(query, genreFilter) {
     }
     
     processed = chunkEnd;
-    
-    // Update progress
     const progressPercent = (processed / totalBooks) * 100;
     progressFill.style.width = `${progressPercent}%`;
     progressText.textContent = `Searching... ${Math.round(progressPercent)}%`;
     
     if (processed < totalBooks) {
-      // Process next chunk on next frame
       setTimeout(processChunk, 0);
     } else {
-      // Search complete
       loadingProgress.style.display = 'none';
       renderHomePage(filtered);
       statsEl.textContent = `📚 Found ${filtered.length} books matching your search`;
     }
   }
-  
   processChunk();
 }
 
 document.getElementById('genreFilter').addEventListener('change', ()=> document.getElementById('searchInput').dispatchEvent(new Event('input')));
 
-/* READ LATER (localStorage) */
-function getReadLater(){ 
-  try{ 
-    return JSON.parse(localStorage.getItem('gutenberg:readlater')||'[]') 
-  }catch(e){ 
-    return [] 
-  } 
-}
-
-function saveReadLater(list){ 
-  localStorage.setItem('gutenberg:readlater', JSON.stringify(list)); 
-}
-
-function isInReadLater(url){ 
-  if(!url) return false; 
-  return getReadLater().some(i=>i.textUrl===url); 
-}
-
+/* READ LATER */
+function getReadLater(){ try{ return JSON.parse(localStorage.getItem('gutenberg:readlater')||'[]') }catch(e){ return [] } }
+function saveReadLater(list){ localStorage.setItem('gutenberg:readlater', JSON.stringify(list)); }
+function isInReadLater(url){ if(!url) return false; return getReadLater().some(i=>i.textUrl===url); }
 function toggleReadLater(book){
   const list = getReadLater();
   const idx = list.findIndex(b=>b.textUrl===book.textUrl);
   if (idx === -1) { 
     list.unshift({
-      title:book.title, 
-      author:book.author, 
-      textUrl:book.textUrl, 
-      cover:book.cover,
-      addedDate: new Date().toISOString()
+      title:book.title, author:book.author, textUrl:book.textUrl, cover:book.cover, addedDate: new Date().toISOString()
     }); 
-    saveReadLater(list); 
-    showToast('Added to Read Later'); 
+    saveReadLater(list); showToast('Added to Read Later');
   }
-  else { 
-    list.splice(idx,1); 
-    saveReadLater(list); 
-    showToast('Removed from Read Later'); 
-  }
+  else { list.splice(idx,1); saveReadLater(list); showToast('Removed from Read Later'); }
   renderReadLaterList();
 }
 
-/* FAVORITES (localStorage) */
-function getFavorites(){
-  try{
-    return JSON.parse(localStorage.getItem('gutenberg:favorites')||'[]')
-  }catch(e){
-    return []
-  }
-}
-
-function saveFavorites(list){
-  localStorage.setItem('gutenberg:favorites', JSON.stringify(list));
-}
-
-function isInFavorites(url){
-  if(!url) return false;
-  return getFavorites().some(i=>i.textUrl===url);
-}
-
+/* FAVORITES */
+function getFavorites(){ try{ return JSON.parse(localStorage.getItem('gutenberg:favorites')||'[]') }catch(e){ return [] } }
+function saveFavorites(list){ localStorage.setItem('gutenberg:favorites', JSON.stringify(list)); }
+function isInFavorites(url){ if(!url) return false; return getFavorites().some(i=>i.textUrl===url); }
 function toggleFavorite(book){
   const list = getFavorites();
   const idx = list.findIndex(b=>b.textUrl===book.textUrl);
   if (idx === -1) {
     list.unshift({
-      title:book.title,
-      author:book.author,
-      textUrl:book.textUrl,
-      cover:book.cover,
-      addedDate: new Date().toISOString()
+      title:book.title, author:book.author, textUrl:book.textUrl, cover:book.cover, addedDate: new Date().toISOString()
     });
-    saveFavorites(list);
-    showToast('Added to Favorites');
+    saveFavorites(list); showToast('Added to Favorites');
   }
-  else {
-    list.splice(idx,1);
-    saveFavorites(list);
-    showToast('Removed from Favorites');
-  }
+  else { list.splice(idx,1); saveFavorites(list); showToast('Removed from Favorites'); }
   if (document.getElementById('tab-favorites').classList.contains('active')) renderFavoritesList();
 }
 
@@ -1574,155 +1353,63 @@ function renderFavoritesList(){
   const wrap = document.getElementById('favoritesList');
   const empty = document.getElementById('favoritesEmpty');
   const list = getFavorites();
-  wrap.innerHTML='';
-  empty.style.display='none';
-
-  if (!list.length){
-    empty.style.display='block';
-    return;
-  }
-
+  wrap.innerHTML=''; empty.style.display='none';
+  if (!list.length){ empty.style.display='block'; return; }
   list.forEach(b=>{
-    const card = document.createElement('div');
-    card.className = 'readlater-card'; // reuse style
-
-    const coverWrap = document.createElement('div');
-    coverWrap.className = 'readlater-cover';
-
+    const card = document.createElement('div'); card.className = 'readlater-card';
+    const coverWrap = document.createElement('div'); coverWrap.className = 'readlater-cover';
     if (b.cover){
-      const img = document.createElement('img');
-      img.src = b.cover;
-      img.onerror = () => {
-        coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`;
-      };
+      const img = document.createElement('img'); img.src = b.cover;
+      img.onerror = () => { coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`; };
       coverWrap.appendChild(img);
-    } else {
-      coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`;
-    }
-
-    const info = document.createElement('div');
-    info.className = 'readlater-info';
-
-    const title = document.createElement('div');
-    title.className = 'readlater-title';
-    title.textContent = b.title;
-
-    const author = document.createElement('div');
-    author.className = 'readlater-author';
-    author.textContent = b.author || '';
-
-    const date = document.createElement('div');
-    date.className = 'readlater-date';
-    date.textContent = `Added: ${formatDate(b.addedDate)}`;
-
-    info.appendChild(title);
-    info.appendChild(author);
-    info.appendChild(date);
-
-    const actions = document.createElement('div');
-    actions.className = 'readlater-actions';
-
-    const openBtn = document.createElement('button');
-    openBtn.className = 'readlater-open';
-    openBtn.textContent = 'Open';
+    } else { coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`; }
+    const info = document.createElement('div'); info.className = 'readlater-info';
+    const title = document.createElement('div'); title.className = 'readlater-title'; title.textContent = b.title;
+    const author = document.createElement('div'); author.className = 'readlater-author'; author.textContent = b.author || '';
+    const date = document.createElement('div'); date.className = 'readlater-date'; date.textContent = `Added: ${formatDate(b.addedDate)}`;
+    info.appendChild(title); info.appendChild(author); info.appendChild(date);
+    const actions = document.createElement('div'); actions.className = 'readlater-actions';
+    const openBtn = document.createElement('button'); openBtn.className = 'readlater-open'; openBtn.textContent = 'Open';
     openBtn.addEventListener('click', () => openBook(b));
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'readlater-remove';
-    removeBtn.textContent = 'Remove';
-    removeBtn.addEventListener('click', () => {
-      toggleFavorite(b);
-    });
-
-    actions.appendChild(openBtn);
-    actions.appendChild(removeBtn);
-
-    card.appendChild(coverWrap);
-    card.appendChild(info);
-    card.appendChild(actions);
-
+    const removeBtn = document.createElement('button'); removeBtn.className = 'readlater-remove'; removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', () => { toggleFavorite(b); });
+    actions.appendChild(openBtn); actions.appendChild(removeBtn);
+    card.appendChild(coverWrap); card.appendChild(info); card.appendChild(actions);
     wrap.appendChild(card);
   });
 }
 
-/* render Read Later list */
 function renderReadLaterList(){
   const wrap = document.getElementById('readLaterList');
   const empty = document.getElementById('readLaterEmpty');
   const list = getReadLater();
-  wrap.innerHTML=''; 
-  empty.style.display='none';
-  
-  if (!list.length){ 
-    empty.style.display='block'; 
-    return; 
-  }
-  
+  wrap.innerHTML=''; empty.style.display='none';
+  if (!list.length){ empty.style.display='block'; return; }
   list.forEach(b=>{
-    const card = document.createElement('div');
-    card.className = 'readlater-card';
-    
-    const coverWrap = document.createElement('div');
-    coverWrap.className = 'readlater-cover';
-    
+    const card = document.createElement('div'); card.className = 'readlater-card';
+    const coverWrap = document.createElement('div'); coverWrap.className = 'readlater-cover';
     if (b.cover){ 
-      const img = document.createElement('img'); 
-      img.src = b.cover; 
-      img.onerror = () => {
-        coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`;
-      }; 
+      const img = document.createElement('img'); img.src = b.cover;
+      img.onerror = () => { coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`; };
       coverWrap.appendChild(img); 
-    } else {
-      coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`;
-    }
-    
-    const info = document.createElement('div');
-    info.className = 'readlater-info';
-    
-    const title = document.createElement('div');
-    title.className = 'readlater-title';
-    title.textContent = b.title;
-    
-    const author = document.createElement('div');
-    author.className = 'readlater-author';
-    author.textContent = b.author || '';
-    
-    const date = document.createElement('div');
-    date.className = 'readlater-date';
-    date.textContent = `Added: ${formatDate(b.addedDate)}`;
-    
-    info.appendChild(title);
-    info.appendChild(author);
-    info.appendChild(date);
-    
-    const actions = document.createElement('div');
-    actions.className = 'readlater-actions';
-    
-    const openBtn = document.createElement('button');
-    openBtn.className = 'readlater-open';
-    openBtn.textContent = 'Open';
+    } else { coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`; }
+    const info = document.createElement('div'); info.className = 'readlater-info';
+    const title = document.createElement('div'); title.className = 'readlater-title'; title.textContent = b.title;
+    const author = document.createElement('div'); author.className = 'readlater-author'; author.textContent = b.author || '';
+    const date = document.createElement('div'); date.className = 'readlater-date'; date.textContent = `Added: ${formatDate(b.addedDate)}`;
+    info.appendChild(title); info.appendChild(author); info.appendChild(date);
+    const actions = document.createElement('div'); actions.className = 'readlater-actions';
+    const openBtn = document.createElement('button'); openBtn.className = 'readlater-open'; openBtn.textContent = 'Open';
     openBtn.addEventListener('click', () => openBook(b));
-    
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'readlater-remove';
-    removeBtn.textContent = 'Remove';
-    removeBtn.addEventListener('click', () => { 
-      toggleReadLater(b); 
-      renderReadLaterList(); 
-    });
-    
-    actions.appendChild(openBtn);
-    actions.appendChild(removeBtn);
-    
-    card.appendChild(coverWrap);
-    card.appendChild(info);
-    card.appendChild(actions);
-    
+    const removeBtn = document.createElement('button'); removeBtn.className = 'readlater-remove'; removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', () => { toggleReadLater(b); renderReadLaterList(); });
+    actions.appendChild(openBtn); actions.appendChild(removeBtn);
+    card.appendChild(coverWrap); card.appendChild(info); card.appendChild(actions);
     wrap.appendChild(card);
   });
 }
 
-/* CONTINUE READING: scan localStorage keys for last page markers */
+/* CONTINUE READING */
 function getContinueList(){
   const list=[];
   for (let i=0;i<localStorage.length;i++){
@@ -1732,31 +1419,20 @@ function getContinueList(){
       const url = key.replace('gutenberg:lastpage:','');
       const idx = parseInt(localStorage.getItem(key),10) || 0;
       const lastRead = localStorage.getItem('gutenberg:lastread:' + url) || '';
-      
-      // find book meta from books[] or readLater
       let meta = books.find(b=>b.textUrl===url) || getReadLater().find(b=>b.textUrl===url) || null;
       if (meta) {
         list.push({
-          title:meta.title, 
-          author:meta.author, 
-          textUrl:url, 
-          lastPage:idx,
-          lastRead: lastRead,
+          title:meta.title, author:meta.author, textUrl:url, lastPage:idx, lastRead: lastRead,
           totalPages: parseInt(localStorage.getItem('gutenberg:totalpages:' + url) || '1', 10)
         });
       } else {
         list.push({
-          title:url.split('/').slice(-1)[0], 
-          author:'', 
-          textUrl:url, 
-          lastPage:idx,
-          lastRead: lastRead,
+          title:url.split('/').slice(-1)[0], author:'', textUrl:url, lastPage:idx, lastRead: lastRead,
           totalPages: parseInt(localStorage.getItem('gutenberg:totalpages:' + url) || '1', 10)
         });
       }
     }
   }
-  // sort by most recently read
   return list.sort((a, b) => new Date(b.lastRead) - new Date(a.lastRead));
 }
 
@@ -1764,429 +1440,67 @@ function renderContinueList(){
   const wrap = document.getElementById('continueList');
   const empty = document.getElementById('continueEmpty');
   const list = getContinueList();
-  wrap.innerHTML=''; 
-  empty.style.display='none';
-  
-  if (!list.length){ 
-    empty.style.display='block'; 
-    return; 
-  }
-  
+  wrap.innerHTML=''; empty.style.display='none';
+  if (!list.length){ empty.style.display='block'; return; }
   list.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'continue-card';
-    
-    const header = document.createElement('div');
-    header.className = 'continue-header';
-    
-    const title = document.createElement('div');
-    title.className = 'continue-title';
-    title.textContent = item.title;
-    
-    const date = document.createElement('div');
-    date.className = 'continue-date';
-    date.textContent = item.lastRead ? formatDate(item.lastRead) : 'Unknown';
-    
-    header.appendChild(title);
-    header.appendChild(date);
-    
-    const author = document.createElement('div');
-    author.className = 'continue-author';
-    author.textContent = item.author || '';
-    
-    const progressContainer = document.createElement('div');
-    progressContainer.className = 'progress-container';
-    
-    const progressInfo = document.createElement('div');
-    progressInfo.className = 'progress-info';
+    const card = document.createElement('div'); card.className = 'continue-card';
+    const header = document.createElement('div'); header.className = 'continue-header';
+    const title = document.createElement('div'); title.className = 'continue-title'; title.textContent = item.title;
+    const date = document.createElement('div'); date.className = 'continue-date'; date.textContent = item.lastRead ? formatDate(item.lastRead) : 'Unknown';
+    header.appendChild(title); header.appendChild(date);
+    const author = document.createElement('div'); author.className = 'continue-author'; author.textContent = item.author || '';
+    const progressContainer = document.createElement('div'); progressContainer.className = 'progress-container';
+    const progressInfo = document.createElement('div'); progressInfo.className = 'progress-info';
     progressInfo.innerHTML = `<span>Page ${item.lastPage + 1} of ${item.totalPages}</span><span>${Math.round((item.lastPage / item.totalPages) * 100)}%</span>`;
-    
-    const progressBar = document.createElement('div');
-    progressBar.className = 'progress-bar';
-    
-    const progressFill = document.createElement('div');
-    progressFill.className = 'progress-fill';
+    const progressBar = document.createElement('div'); progressBar.className = 'progress-bar';
+    const progressFill = document.createElement('div'); progressFill.className = 'progress-fill';
     progressFill.style.width = `${(item.lastPage / item.totalPages) * 100}%`;
-    
-    progressBar.appendChild(progressFill);
-    progressContainer.appendChild(progressInfo);
-    progressContainer.appendChild(progressBar);
-    
-    const actions = document.createElement('div');
-    actions.className = 'continue-actions';
-    
-    const continueBtn = document.createElement('button');
-    continueBtn.className = 'continue-btn';
-    continueBtn.textContent = 'Continue';
+    progressBar.appendChild(progressFill); progressContainer.appendChild(progressInfo); progressContainer.appendChild(progressBar);
+    const actions = document.createElement('div'); actions.className = 'continue-actions';
+    const continueBtn = document.createElement('button'); continueBtn.className = 'continue-btn'; continueBtn.textContent = 'Continue';
     continueBtn.addEventListener('click', () => openBook({title:item.title, textUrl:item.textUrl}));
-    
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'remove-btn';
-    removeBtn.textContent = 'Remove';
+    const removeBtn = document.createElement('button'); removeBtn.className = 'remove-btn'; removeBtn.textContent = 'Remove';
     removeBtn.addEventListener('click', () => { 
       localStorage.removeItem('gutenberg:lastpage:' + item.textUrl);
       localStorage.removeItem('gutenberg:lastread:' + item.textUrl);
       localStorage.removeItem('gutenberg:totalpages:' + item.textUrl);
       renderContinueList(); 
     });
-    
-    actions.appendChild(continueBtn);
-    actions.appendChild(removeBtn);
-    
-    card.appendChild(header);
-    card.appendChild(author);
-    card.appendChild(progressContainer);
-    card.appendChild(actions);
-    
+    actions.appendChild(continueBtn); actions.appendChild(removeBtn);
+    card.appendChild(header); card.appendChild(author); card.appendChild(progressContainer); card.appendChild(actions);
     wrap.appendChild(card);
   });
 }
 
-/* Format date for display */
 function formatDate(dateString) {
   if (!dateString) return 'Unknown';
-  
   const date = new Date(dateString);
   const now = new Date();
   const diffTime = Math.abs(now - date);
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  
-  if (diffDays === 0) {
-    return 'Today';
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays < 7) {
-    return `${diffDays} days ago`;
-  } else {
-    return date.toLocaleDateString();
-  }
+  if (diffDays === 0) return 'Today';
+  else if (diffDays === 1) return 'Yesterday';
+  else if (diffDays < 7) return `${diffDays} days ago`;
+  else return date.toLocaleDateString();
 }
 
-/* Open book: fetch via worker, clean, paginate and render at saved page (if any) */
-async function openBook(book){
-  // book may be object or textUrl string
+/* OPEN BOOK - REDIRECT TO READER.HTML */
+function openBook(book){
   const b = (typeof book === 'string') ? books.find(x=>x.textUrl===book) : book;
   if (!b || !b.textUrl) { alert('No text URL'); return; }
-  currentBook = { title: b.title, textUrl: b.textUrl, author: b.author, cover: b.cover };
 
-  readerTitle.textContent = currentBook.title || 'Untitled';
-  showReader();
+  // Construct URL
+  const params = new URLSearchParams();
+  params.append('url', b.textUrl);
+  params.append('title', b.title);
+  params.append('author', b.author || '');
+  if (b.cover) params.append('cover', b.cover);
 
-  try {
-    const resp = await fetch(`${PROXY_URL}?url=${encodeURIComponent(currentBook.textUrl)}&key=${encodeURIComponent(PROXY_KEY)}`);
-    if (!resp.ok) {
-      const body = await resp.text().catch(()=>resp.statusText||'');
-      throw new Error('Proxy fetch failed: ' + resp.status + ' ' + body);
-    }
-    const raw = await resp.text();
-    const plain = extractPlainText(raw);
-    paginateText(plain, wordsPerPage);
-    // restore last page index
-    const saved = parseInt(localStorage.getItem('gutenberg:lastpage:' + currentBook.textUrl) || '0', 10);
-    currentPage = Math.max(0, Math.min(saved, pages.length - 1));
-    renderPage(currentPage);
-    // add to "continue" automatically (localStorage lastpage will be set by renderPage)
-    renderContinueList();
-  } catch (err) {
-    console.error('openBook error', err);
-    pageContent.innerHTML = `<div style="padding:18px;color:#c0392b">Failed to load book: ${escapeHtml(err.message || err)}</div>`;
-  }
+  // Use location.href for same-tab navigation
+  window.location.href = 'reader.html?' + params.toString();
 }
 
-function showReader(){ 
-  readerEl.style.display='block'; 
-  document.body.style.overflow='hidden'; 
-  // Reset page indicator visibility
-  clearTimeout(pageIndicatorTimeout);
-  readerFooter.classList.remove('hidden');
-  pageIndicatorTimeout = setTimeout(() => {
-    readerFooter.classList.add('hidden');
-  }, 3000);
-}
-
-function hideReader(){ 
-  readerEl.style.display='none'; 
-  document.body.style.overflow=''; 
-  renderContinueList(); 
-  renderReadLaterList(); 
-  renderFavoritesList();
-}
-
-/* clean Gutenberg headers/footers and return plain text (paragraphs separated by double newline) */
-function extractPlainText(raw){
-  let s = (raw || '').replace(/\r\n/g, '\n');
-  const U = s.toUpperCase();
-  const startMarkers = ['*** START OF THE PROJECT GUTENBERG EBOOK','*** START OF THIS PROJECT GUTENBERG EBOOK','***START OF THE PROJECT GUTENBERG EBOOK','*** START'];
-  let startIdx = -1;
-  for (const m of startMarkers){ const i = U.indexOf(m); if (i !== -1){ startIdx = i; break; } }
-  if (startIdx !== -1){
-    // find next double newline after marker
-    const after = s.indexOf('\n\n', startIdx);
-    if (after !== -1) s = s.substring(after + 2);
-    else s = s.substring(startIdx);
-  } else {
-    // remove typical metadata top blocks heuristically
-    s = s.replace(/Title:.*\nAuthor:.*\nRelease date:.*\n/gi,'');
-    s = s.replace(/The Project Gutenberg eBook of [\s\S]*?\n\n/gi, '');
-  }
-
-  // Remove footer/common license
-  const footerMarkers = ['*** END OF THE PROJECT GUTENBERG EBOOK','*** END OF THIS PROJECT GUTENBERG EBOOK','END OF PROJECT GUTENBERG','END OF THE PROJECT GUTENBERG'];
-  let endIdx = -1;
-  const SU = s.toUpperCase();
-  for (const fm of footerMarkers){ const i = SU.indexOf(fm); if (i !== -1){ endIdx = i; break; } }
-  if (endIdx !== -1) s = s.substring(0, endIdx);
-
-  // strip extra license paragraph remnants
-  s = s.replace(/This ebook is for the use of anyone anywhere[\s\S]*?www\.gutenberg\.org\./gi, '');
-  // normalize repeated blank lines
-  s = s.replace(/\n{3,}/g, '\n\n').trim();
-
-  return s;
-}
-
-/* PAGINATION: Improved algorithm to prevent cutting content */
-function paginateText(plain, wordsPerPageLocal){
-  const paragraphs = plain.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
-
-  // Build pages by preserving paragraph boundaries
-  const pagesArr = [];
-  let currentPageText = '';
-  let currentWordCount = 0;
-
-  for (let para of paragraphs){
-    const words = para.split(/\s+/).filter(Boolean);
-    const paraWordCount = words.length;
-    
-    // If adding this paragraph would exceed the limit
-    if (currentWordCount + paraWordCount > wordsPerPageLocal) {
-      // If current page has content, push it
-      if (currentPageText) {
-        pagesArr.push(currentPageText);
-        currentPageText = '';
-        currentWordCount = 0;
-      }
-      
-      // If paragraph is too long for a single page, split it
-      if (paraWordCount > wordsPerPageLocal) {
-        let remainingWords = paraWordCount;
-        let startIdx = 0;
-        
-        while (remainingWords > 0) {
-          const take = Math.min(remainingWords, wordsPerPageLocal);
-          const chunk = words.slice(startIdx, startIdx + take).join(' ');
-          pagesArr.push(chunk);
-          startIdx += take;
-          remainingWords -= take;
-        }
-      } else {
-        // Paragraph fits in a new page
-        currentPageText = para;
-        currentWordCount = paraWordCount;
-      }
-    } else {
-      // Add paragraph to current page
-      if (currentPageText) {
-        currentPageText += '\n\n' + para;
-      } else {
-        currentPageText = para;
-      }
-      currentWordCount += paraWordCount;
-    }
-  }
-  
-  // Don't forget the last page
-  if (currentPageText) {
-    pagesArr.push(currentPageText);
-  }
-
-  // Convert pages to HTML
-  pages = pagesArr.map(pageText => {
-    // Split by paragraphs and wrap each in <p> tags
-    const pageParagraphs = pageText.split(/\n\s*\n/).filter(Boolean);
-    return pageParagraphs.map(p => `<p>${escapeHtml(p)}</p>`).join('');
-  });
-  
-  // Ensure non-empty
-  if (!pages.length) pages = ['<p>No content extracted.</p>'];
-  
-  // Save total pages for progress tracking
-  if (currentBook && currentBook.textUrl) {
-    localStorage.setItem('gutenberg:totalpages:' + currentBook.textUrl, pages.length.toString());
-  }
-}
-
-/* render a page (no horizontal scroll) */
-function renderPage(idx){
-  if (!pages || !pages.length) { pageContent.innerHTML = '<div class="empty-note">No pages</div>'; pageIndicator.textContent = 'Page 0 / 0'; return; }
-  currentPage = Math.max(0, Math.min(idx, pages.length - 1));
-  // set font size
-  pageContent.style.fontSize = fontSize + 'px';
-  pageContent.innerHTML = pages[currentPage];
-  pageIndicator.textContent = `Page ${currentPage + 1} / ${pages.length}`;
-  
-  // Update Progress Bar
-  const progressPercent = ((currentPage + 1) / pages.length) * 100;
-  const fill = document.getElementById('readerProgressFill');
-  if (fill) fill.style.width = `${progressPercent}%`;
-
-  // Apply current reader font class to content
-  pageContent.className = 'page-content'; // reset
-
-  // save last page and last read timestamp
-  try { 
-    localStorage.setItem('gutenberg:lastpage:' + currentBook.textUrl, String(currentPage));
-    localStorage.setItem('gutenberg:lastread:' + currentBook.textUrl, new Date().toISOString());
-  } catch(e){}
-  
-  // ensure continue list refresh
-  renderContinueList();
-  
-  // Show page indicator and set timeout to fade it
-  clearTimeout(pageIndicatorTimeout);
-  readerFooter.classList.remove('hidden');
-  pageIndicatorTimeout = setTimeout(() => {
-    readerFooter.classList.add('hidden');
-  }, 3000);
-}
-
-/* navigation handlers */
-function navigatePage(direction) {
-  if (direction === 'next') {
-    renderPage(currentPage + 1);
-  } else if (direction === 'prev') {
-    renderPage(currentPage - 1);
-  }
-}
-
-/* keyboard navigation */
-window.addEventListener('keydown', (e)=>{
-  if (readerEl.style.display === 'block'){
-    if (e.key === 'ArrowRight' || e.key === 'PageDown') { 
-      navigatePage('next'); 
-      e.preventDefault(); 
-    }
-    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { 
-      navigatePage('prev'); 
-      e.preventDefault(); 
-    }
-    if (e.key === 'Escape') hideReader();
-  }
-});
-
-/* swipe/tap navigation areas */
-let tx=0, ty=0;
-function touchStart(e){ 
-  const t = e.touches ? e.touches[0] : e; 
-  tx = t.clientX; 
-  ty = t.clientY; 
-  
-  // Show page indicator on touch
-  clearTimeout(pageIndicatorTimeout);
-  readerFooter.classList.remove('hidden');
-}
-function touchEnd(e){ 
-  const t = e.changedTouches ? e.changedTouches[0] : e; 
-  const dx = t.clientX - tx; 
-  const dy = t.clientY - ty; 
-  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30){ 
-    if (dx < 0) navigatePage('next'); 
-    else navigatePage('prev'); 
-  }
-  
-  // Set timeout to hide page indicator after touch
-  pageIndicatorTimeout = setTimeout(() => {
-    readerFooter.classList.add('hidden');
-  }, 3000);
-}
-
-document.getElementById('navLeft').addEventListener('touchstart', touchStart); 
-document.getElementById('navRight').addEventListener('touchstart', touchStart);
-document.getElementById('navLeft').addEventListener('touchend', touchEnd); 
-document.getElementById('navRight').addEventListener('touchend', touchEnd);
-document.getElementById('navLeft').addEventListener('click', ()=> navigatePage('prev')); 
-document.getElementById('navRight').addEventListener('click', ()=> navigatePage('next'));
-
-// Click anywhere on reader to show page indicator temporarily
-readerEl.addEventListener('click', (e) => {
-  // Don't trigger if clicking on navigation areas
-  if (e.target.id !== 'navLeft' && e.target.id !== 'navRight' && 
-      !e.target.closest('#navLeft') && !e.target.closest('#navRight')) {
-    clearTimeout(pageIndicatorTimeout);
-    readerFooter.classList.remove('hidden');
-    pageIndicatorTimeout = setTimeout(() => {
-      readerFooter.classList.add('hidden');
-    }, 3000);
-  }
-});
-
-/* Reader Settings Logic */
-const readerSettingsToggle = document.getElementById('readerSettingsToggle');
-const readerSettingsPanel = document.getElementById('readerSettingsPanel');
-const readerBackBtn = document.getElementById('readerBackBtn');
-
-readerBackBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  hideReader();
-});
-
-readerSettingsToggle.addEventListener('click', (e) => {
-  e.stopPropagation();
-  readerSettingsPanel.style.display = readerSettingsPanel.style.display === 'none' ? 'block' : 'none';
-});
-
-// Close panel when clicking outside
-document.addEventListener('click', (e) => {
-  if (readerSettingsPanel.style.display === 'block' &&
-      !readerSettingsPanel.contains(e.target) &&
-      e.target !== readerSettingsToggle) {
-    readerSettingsPanel.style.display = 'none';
-  }
-});
-
-// Font Size
-document.getElementById('fontInc').addEventListener('click', (e) => { e.stopPropagation(); fontSize = Math.min(24, fontSize + 1); applyReaderSettings(); renderPage(currentPage); });
-document.getElementById('fontDec').addEventListener('click', (e) => { e.stopPropagation(); fontSize = Math.max(8, fontSize - 1); applyReaderSettings(); renderPage(currentPage); });
-
-// Theme & Font
-document.querySelectorAll('.settings-btn[data-theme]').forEach(btn => {
-  btn.addEventListener('click', (e) => { e.stopPropagation(); readerTheme = btn.dataset.theme; applyReaderSettings(); });
-});
-document.querySelectorAll('.settings-btn[data-font]').forEach(btn => {
-  btn.addEventListener('click', (e) => { e.stopPropagation(); readerFont = btn.dataset.font; applyReaderSettings(); });
-});
-
-function loadReaderSettings() {
-  try {
-    const s = JSON.parse(localStorage.getItem('gutenberg:readerSettings'));
-    if (s) {
-      if (s.fontSize) fontSize = s.fontSize;
-      if (s.theme) readerTheme = s.theme;
-      if (s.font) readerFont = s.font;
-    }
-  } catch(e) {}
-  applyReaderSettings();
-}
-
-function applyReaderSettings() {
-  // Save
-  localStorage.setItem('gutenberg:readerSettings', JSON.stringify({ fontSize, theme: readerTheme, font: readerFont }));
-
-  // Apply Theme & Font
-  readerEl.className = `reader-fullscreen theme-${readerTheme} font-${readerFont}`;
-
-  // Update Buttons active state
-  document.querySelectorAll('.settings-btn[data-theme]').forEach(b => b.classList.toggle('active', b.dataset.theme === readerTheme));
-  document.querySelectorAll('.settings-btn[data-font]').forEach(b => b.classList.toggle('active', b.dataset.font === readerFont));
-
-  // Font Size update live
-  if (pageContent) pageContent.style.fontSize = fontSize + 'px';
-}
-
-/* CONTINUE & READ LATER helpers - after page change, these lists update */
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-/* small toast */
 function showToast(text){
   const t = document.createElement('div'); t.textContent = text; t.className = 'toast';
   document.body.appendChild(t); setTimeout(()=>t.remove(), 2000);
