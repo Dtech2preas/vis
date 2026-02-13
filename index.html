@@ -19,6 +19,70 @@
     --page-words: 500;
   }
 
+  body.dark-mode {
+    --accent: #c2a88d;
+    --accent-light: #5a4a3a;
+    --accent-dark: #e8dfd3;
+    --text: #e8dfd3;
+    --text-light: #c0b0a0;
+    --muted: #8b7b6b;
+    --background: #1a1614;
+    --card-bg: #26201c;
+  }
+
+  body.dark-mode #homeSection {
+    background: linear-gradient(135deg, #1a1614 0%, #2c2420 100%);
+    border-color: #3e3228;
+  }
+
+  body.dark-mode .genre-section {
+    background: rgba(44, 36, 32, 0.7);
+    border-color: #3e3228;
+  }
+
+  body.dark-mode .genre-header {
+    border-bottom-color: #3e3228;
+  }
+
+  body.dark-mode .book-card {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  }
+
+  body.dark-mode #continueSection {
+    background: linear-gradient(135deg, #1c261c 0%, #253025 100%);
+    border-color: #2d3d2d;
+  }
+
+  body.dark-mode .continue-card {
+    background: #253025;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  body.dark-mode .continue-title {
+    color: #8fbc8f;
+  }
+
+  body.dark-mode #readLaterSection {
+    background: linear-gradient(135deg, #261c1c 0%, #302525 100%);
+    border-color: #3d2d2d;
+  }
+
+  body.dark-mode .readlater-card {
+    background: #302525;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  body.dark-mode .readlater-title {
+    color: #bc8f8f;
+  }
+
+  /* Adjust inputs for dark mode */
+  body.dark-mode input, body.dark-mode select {
+    background: #2c2420;
+    color: var(--text);
+    border-color: var(--accent-light);
+  }
+
   html,body{
     height:100%;
     margin:0;
@@ -684,36 +748,89 @@
     display:none;
     position:fixed;
     inset:0;
-    background:#f5f1ea;
-    color:var(--text);
+    background:var(--reader-bg, #f5f1ea);
+    color:var(--reader-text, #2c1810);
     z-index:9999;
     overflow:hidden;
     font-family:var(--book-font);
   }
 
+  /* Reader Themes */
+  .reader-fullscreen.theme-light { --reader-bg: #e0e0e0; --reader-text: #000000; --page-bg: #ffffff; }
+  .reader-fullscreen.theme-sepia { --reader-bg: #f5f1ea; --reader-text: #5f4b32; --page-bg: #fdfaf6; }
+  .reader-fullscreen.theme-dark { --reader-bg: #1a1614; --reader-text: #b0b0b0; --page-bg: #2c2420; }
+
+  /* Reader Fonts */
+  .font-serif .page-content { font-family: "Georgia", serif; }
+  .font-sans .page-content { font-family: system-ui, sans-serif; }
+  .font-mono .page-content { font-family: "Courier New", monospace; }
+
   .reader-header{
-    height:0;
-    padding:0;
-    overflow:hidden;
+    height:50px;
+    padding:0 15px;
+    background:var(--card-bg);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--accent-light);
   }
 
   .reader-title{
     font-weight:700;
     font-family:var(--book-font);
-    font-size:18px;
-    max-width:50%;
+    font-size:16px;
+    max-width:60%;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
     color:var(--accent-dark);
   }
 
+  .reader-settings-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+  }
+  .reader-settings-btn:hover { background: rgba(0,0,0,0.05); }
+
+  .settings-panel {
+    position: absolute;
+    top: 55px;
+    right: 15px;
+    background: var(--card-bg);
+    border: 1px solid var(--accent-light);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 10001;
+    width: 250px;
+    color: var(--text);
+  }
+
+  .settings-row { margin-bottom: 12px; }
+  .settings-row:last-child { margin-bottom: 0; }
+  .settings-label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+  .settings-options { display: flex; gap: 5px; }
+  .settings-btn {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid var(--accent-light);
+    background: var(--background);
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .settings-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
   .reader-body{
-    height:100%;
+    height:calc(100% - 50px);
     display:flex;
     align-items:center;
     justify-content:center;
-    background:#f5f1ea;
     position:relative;
   }
 
@@ -732,14 +849,15 @@
   .page{
     width:100%;
     height:100%;
-    background:#fff;
+    background:var(--page-bg, #fff);
+    color:var(--reader-text);
     border-radius:4px;
     box-shadow:0 10px 30px rgba(0,0,0,0.1);
     display:flex;
     flex-direction:column;
     overflow:hidden;
     position:relative;
-    border:1px solid #e6dfd5;
+    border:1px solid var(--accent-light);
   }
 
   .page-content{
@@ -941,7 +1059,9 @@
     <div class="tab active" id="tab-home">Home</div>
     <div class="tab" id="tab-continue">Continue</div>
     <div class="tab" id="tab-readlater">Read Later</div>
+    <div class="tab" id="tab-favorites">Favorites</div>
   </div>
+  <button id="themeToggle" class="small-btn" aria-label="Toggle Dark Mode">🌙</button>
 </div>
 
 <!-- search/filters -->
@@ -976,12 +1096,45 @@
     <div id="readLaterList" class="readlater-grid"></div>
     <div id="readLaterEmpty" class="empty-note" style="display:none">No saved books — add some using the "Read Later" button on a book card.</div>
   </div>
+
+  <div id="favoritesSection" style="display:none">
+    <h2 class="section-title">Favorites</h2>
+    <div id="favoritesList" class="readlater-grid"></div>
+    <div id="favoritesEmpty" class="empty-note" style="display:none">No favorites — click the heart icon on a book to save it here.</div>
+  </div>
 </div>
 
 <!-- Reader fullscreen -->
 <div class="reader-fullscreen" id="reader">
   <div class="reader-header">
     <div class="reader-title" id="readerTitle">Loading...</div>
+    <button id="readerSettingsToggle" class="reader-settings-btn" aria-label="Reader Settings">⚙️</button>
+  </div>
+
+  <div id="readerSettingsPanel" class="settings-panel" style="display:none">
+    <div class="settings-row">
+      <span class="settings-label">Theme</span>
+      <div class="settings-options">
+        <button class="settings-btn" data-theme="light">Light</button>
+        <button class="settings-btn" data-theme="sepia">Sepia</button>
+        <button class="settings-btn" data-theme="dark">Dark</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Font Family</span>
+      <div class="settings-options">
+        <button class="settings-btn" data-font="serif">Serif</button>
+        <button class="settings-btn" data-font="sans">Sans</button>
+        <button class="settings-btn" data-font="mono">Mono</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Font Size</span>
+      <div class="settings-options">
+        <button class="settings-btn" id="fontDec">-</button>
+        <button class="settings-btn" id="fontInc">+</button>
+      </div>
+    </div>
   </div>
 
   <div class="reader-body">
@@ -1016,6 +1169,11 @@ const GENRES_PER_LOAD = 5;                  // Number of genres to show initiall
 const GENRES_PER_FILTER = 40;               // Number of genres to show in filter dropdown
 const CHUNK_SIZE = 5000;                    // Size of data chunks to process at once
 
+/* INDEXEDDB CONFIG */
+const DB_NAME = 'GutenbergLibDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'books';
+
 /* STATE */
 let books = [];
 let pages = [];            // current pages (HTML strings)
@@ -1023,6 +1181,8 @@ let currentPage = 0;
 let currentBook = null;    // {title, textUrl, cover, author}
 let wordsPerPage = WORDS_PER_PAGE_DEFAULT;
 let fontSize = FONT_SIZE_DEFAULT;
+let readerTheme = 'sepia';
+let readerFont = 'serif';
 let pageIndicatorTimeout;
 let genreDisplayCounts = {}; // Track how many books are shown per genre
 let genresToShow = GENRES_PER_LOAD; // Track how many genres to display
@@ -1045,32 +1205,134 @@ const loadingProgress = document.getElementById('loadingProgress');
 const progressFill = document.getElementById('progressFill');
 const progressText = document.getElementById('progressText');
 
+/* Dark Mode */
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('theme');
+
+if (savedTheme === 'dark') {
+  document.body.classList.add('dark-mode');
+  themeToggle.textContent = '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  themeToggle.textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
+
 /* Tabs */
 const tabHome = document.getElementById('tab-home');
 const tabContinue = document.getElementById('tab-continue');
 const tabReadLater = document.getElementById('tab-readlater');
+const tabFavorites = document.getElementById('tab-favorites');
 const homeSection = document.getElementById('homeSection');
 const continueSection = document.getElementById('continueSection');
 const readLaterSection = document.getElementById('readLaterSection');
+const favoritesSection = document.getElementById('favoritesSection');
 
 tabHome.addEventListener('click', () => switchTab('home'));
 tabContinue.addEventListener('click', () => switchTab('continue'));
 tabReadLater.addEventListener('click', () => switchTab('readlater'));
+tabFavorites.addEventListener('click', () => switchTab('favorites'));
 
 function switchTab(id){
-  tabHome.classList.remove('active'); tabContinue.classList.remove('active'); tabReadLater.classList.remove('active');
-  homeSection.style.display = 'none'; continueSection.style.display = 'none'; readLaterSection.style.display = 'none';
+  tabHome.classList.remove('active'); tabContinue.classList.remove('active'); tabReadLater.classList.remove('active'); tabFavorites.classList.remove('active');
+  homeSection.style.display = 'none'; continueSection.style.display = 'none'; readLaterSection.style.display = 'none'; favoritesSection.style.display = 'none';
   if (id==='home'){ tabHome.classList.add('active'); homeSection.style.display='block'; }
   if (id==='continue'){ tabContinue.classList.add('active'); continueSection.style.display='block'; renderContinueList(); }
   if (id==='readlater'){ tabReadLater.classList.add('active'); readLaterSection.style.display='block'; renderReadLaterList(); }
+  if (id==='favorites'){ tabFavorites.classList.add('active'); favoritesSection.style.display='block'; renderFavoritesList(); }
 }
 
 /* load data.txt and parse */
-window.addEventListener('load', loadBooks);
+window.addEventListener('load', () => {
+  loadBooks(false);
+  loadReaderSettings();
+});
 
-async function loadBooks(){
+/* INDEXEDDB FUNCTIONS */
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = event => reject('IndexedDB error: ' + event.target.error);
+    request.onsuccess = event => resolve(event.target.result);
+    request.onupgradeneeded = event => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+      }
+    };
+  });
+}
+
+async function getAllBooksFromDB() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.getAll();
+    request.onsuccess = event => resolve(event.target.result);
+    request.onerror = event => reject('Error getting books from DB: ' + event.target.error);
+  });
+}
+
+async function addBooksToDB(booksToAdd) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    // Clear existing to avoid duplicates if re-populating
+    store.clear().onsuccess = () => {
+      booksToAdd.forEach(book => store.add(book));
+    };
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = event => reject('Error adding books to DB: ' + event.target.error);
+  });
+}
+
+async function clearBooksDB() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.clear();
+    request.onsuccess = () => resolve();
+    request.onerror = event => reject('Error clearing DB: ' + event.target.error);
+  });
+}
+
+async function loadBooks(forceRefresh = false){
   try {
     loadingProgress.style.display = 'flex';
+
+    // 1. Try loading from IndexedDB first (unless forced refresh)
+    if (!forceRefresh) {
+      progressText.textContent = 'Checking local cache...';
+      try {
+        const cachedBooks = await getAllBooksFromDB();
+        if (cachedBooks && cachedBooks.length > 0) {
+          books = cachedBooks;
+          loadingProgress.style.display = 'none';
+          statsEl.innerHTML = `📚 ${books.length} books loaded from cache <button onclick="loadBooks(true)" class="small-btn" style="margin-left:10px">Refresh Data</button>`;
+          renderHomePage();
+          populateGenreFilter();
+
+          // Show/hide load more genres button logic
+          const genres = new Set(books.map(b => b.genre));
+          if (genres.size > genresToShow) {
+            loadMoreGenresBtn.style.display = 'block';
+          } else {
+            loadMoreGenresBtn.style.display = 'none';
+          }
+          return;
+        }
+      } catch (e) {
+        console.warn('IndexedDB failed, falling back to network', e);
+      }
+    }
+
+    // 2. Fetch data.txt
     progressText.textContent = 'Loading data file...';
     
     const r = await fetch('data.txt', {cache:'no-store'});
@@ -1094,12 +1356,22 @@ async function loadBooks(){
       progressText.textContent = `Loading data... ${Math.round(progressPercent)}%`;
     }
     
-    rawData = chunks.map(chunk => decoder.decode(chunk)).join('');
+    // Correctly join chunks
+    let combined = new Uint8Array(receivedLength);
+    let position = 0;
+    for(let chunk of chunks) {
+      combined.set(chunk, position);
+      position += chunk.length;
+    }
+    rawData = decoder.decode(combined);
+
     progressFill.style.width = '50%';
     progressText.textContent = 'Processing data...';
     
     // Start processing data in chunks
-    processDataChunk();
+    // Clear books array before processing if it was a refresh
+    if (forceRefresh) books = [];
+    processDataChunk(true); // pass true to indicate we should save to DB at end
   } catch(err){
     console.error('loadBooks', err);
     homeContent.innerHTML = '<div class="empty-note">Error loading data.txt — open console.</div>';
@@ -1109,7 +1381,7 @@ async function loadBooks(){
 }
 
 /* Process data in chunks to avoid freezing */
-function processDataChunk() {
+function processDataChunk(saveToDB = false) {
   if (isProcessing) return;
   isProcessing = true;
   
@@ -1118,13 +1390,20 @@ function processDataChunk() {
     processedData = rawData;
   }
   
-  // Process a chunk of data
-  const chunkEnd = Math.min(CHUNK_SIZE, processedData.length);
+  // Process a chunk of data, careful not to split lines
+  let chunkEnd = Math.min(CHUNK_SIZE, processedData.length);
+  if (chunkEnd < processedData.length) {
+    const lastNewline = processedData.lastIndexOf('\n', chunkEnd);
+    if (lastNewline > 0) {
+      chunkEnd = lastNewline + 1;
+    }
+  }
+
   const chunkToProcess = processedData.substring(0, chunkEnd);
   const remainingData = processedData.substring(chunkEnd);
   
-  // Parse the chunk
-  parseDataChunk(chunkToProcess);
+  // Parse the chunk, appending to existing books
+  parseDataChunk(chunkToProcess, true);
   
   // Update progress
   const progressPercent = 50 + (50 * (rawData.length - remainingData.length) / rawData.length);
@@ -1136,13 +1415,17 @@ function processDataChunk() {
     processedData = remainingData;
     setTimeout(() => {
       isProcessing = false;
-      processDataChunk();
+      processDataChunk(saveToDB);
     }, 10); // Small delay to allow UI updates
   } else {
     // Finished processing
     loadingProgress.style.display = 'none';
     isProcessing = false;
-    statsEl.textContent = `📚 ${books.length} books loaded • Use search/genre`;
+    statsEl.innerHTML = `📚 ${books.length} books loaded • Use search/genre <button onclick="loadBooks(true)" class="small-btn" style="margin-left:10px">Refresh Data</button>`;
+
+    if (saveToDB) {
+      addBooksToDB(books).then(() => console.log('Books saved to DB')).catch(e => console.error(e));
+    }
     
     // Show/hide load more genres button
     const totalGenres = countGenresInData(rawData);
@@ -1243,7 +1526,8 @@ function countGenresInData(text) {
 loadMoreGenresBtn.addEventListener('click', () => {
   genresToShow += GENRES_PER_LOAD;
   processedData = rawData; // Reset to process from beginning with new limit
-  processDataChunk();
+  books = []; // Clear books to rebuild with new limit
+  processDataChunk(false);
 });
 
 /* Render home page with genre sections */
@@ -1369,8 +1653,19 @@ function createBookCard(book) {
   rlBtn.textContent = isInReadLater(book.textUrl) ? 'Remove' : 'Read Later';
   rlBtn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleReadLater(book); rlBtn.textContent = isInReadLater(book.textUrl) ? 'Remove' : 'Read Later'; });
 
+  const favBtn = document.createElement('button');
+  favBtn.className='small-btn';
+  favBtn.innerHTML = isInFavorites(book.textUrl) ? '❤️' : '🤍';
+  favBtn.title = 'Toggle Favorite';
+  favBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    toggleFavorite(book);
+    favBtn.innerHTML = isInFavorites(book.textUrl) ? '❤️' : '🤍';
+  });
+
   row.appendChild(readBtn); 
   row.appendChild(rlBtn);
+  row.appendChild(favBtn);
   card.appendChild(coverWrap); 
   card.appendChild(title); 
   card.appendChild(author); 
@@ -1521,6 +1816,121 @@ function toggleReadLater(book){
     showToast('Removed from Read Later'); 
   }
   renderReadLaterList();
+}
+
+/* FAVORITES (localStorage) */
+function getFavorites(){
+  try{
+    return JSON.parse(localStorage.getItem('gutenberg:favorites')||'[]')
+  }catch(e){
+    return []
+  }
+}
+
+function saveFavorites(list){
+  localStorage.setItem('gutenberg:favorites', JSON.stringify(list));
+}
+
+function isInFavorites(url){
+  if(!url) return false;
+  return getFavorites().some(i=>i.textUrl===url);
+}
+
+function toggleFavorite(book){
+  const list = getFavorites();
+  const idx = list.findIndex(b=>b.textUrl===book.textUrl);
+  if (idx === -1) {
+    list.unshift({
+      title:book.title,
+      author:book.author,
+      textUrl:book.textUrl,
+      cover:book.cover,
+      addedDate: new Date().toISOString()
+    });
+    saveFavorites(list);
+    showToast('Added to Favorites');
+  }
+  else {
+    list.splice(idx,1);
+    saveFavorites(list);
+    showToast('Removed from Favorites');
+  }
+  if (document.getElementById('tab-favorites').classList.contains('active')) renderFavoritesList();
+}
+
+function renderFavoritesList(){
+  const wrap = document.getElementById('favoritesList');
+  const empty = document.getElementById('favoritesEmpty');
+  const list = getFavorites();
+  wrap.innerHTML='';
+  empty.style.display='none';
+
+  if (!list.length){
+    empty.style.display='block';
+    return;
+  }
+
+  list.forEach(b=>{
+    const card = document.createElement('div');
+    card.className = 'readlater-card'; // reuse style
+
+    const coverWrap = document.createElement('div');
+    coverWrap.className = 'readlater-cover';
+
+    if (b.cover){
+      const img = document.createElement('img');
+      img.src = b.cover;
+      img.onerror = () => {
+        coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`;
+      };
+      coverWrap.appendChild(img);
+    } else {
+      coverWrap.innerHTML = `<div class="cover-placeholder">${shortTitle(b.title)}</div>`;
+    }
+
+    const info = document.createElement('div');
+    info.className = 'readlater-info';
+
+    const title = document.createElement('div');
+    title.className = 'readlater-title';
+    title.textContent = b.title;
+
+    const author = document.createElement('div');
+    author.className = 'readlater-author';
+    author.textContent = b.author || '';
+
+    const date = document.createElement('div');
+    date.className = 'readlater-date';
+    date.textContent = `Added: ${formatDate(b.addedDate)}`;
+
+    info.appendChild(title);
+    info.appendChild(author);
+    info.appendChild(date);
+
+    const actions = document.createElement('div');
+    actions.className = 'readlater-actions';
+
+    const openBtn = document.createElement('button');
+    openBtn.className = 'readlater-open';
+    openBtn.textContent = 'Open';
+    openBtn.addEventListener('click', () => openBook(b));
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'readlater-remove';
+    removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', () => {
+      toggleFavorite(b);
+    });
+
+    actions.appendChild(openBtn);
+    actions.appendChild(removeBtn);
+
+    card.appendChild(coverWrap);
+    card.appendChild(info);
+    card.appendChild(actions);
+
+    wrap.appendChild(card);
+  });
 }
 
 /* render Read Later list */
@@ -1787,6 +2197,7 @@ function hideReader(){
   document.body.style.overflow=''; 
   renderContinueList(); 
   renderReadLaterList(); 
+  renderFavoritesList();
 }
 
 /* clean Gutenberg headers/footers and return plain text (paragraphs separated by double newline) */
@@ -1902,6 +2313,9 @@ function renderPage(idx){
   pageContent.innerHTML = pages[currentPage];
   pageIndicator.textContent = `Page ${currentPage + 1} / ${pages.length}`;
   
+  // Apply current reader font class to content
+  pageContent.className = 'page-content'; // reset
+
   // save last page and last read timestamp
   try { 
     localStorage.setItem('gutenberg:lastpage:' + currentBook.textUrl, String(currentPage));
@@ -1988,6 +2402,63 @@ readerEl.addEventListener('click', (e) => {
     }, 3000);
   }
 });
+
+/* Reader Settings Logic */
+const readerSettingsToggle = document.getElementById('readerSettingsToggle');
+const readerSettingsPanel = document.getElementById('readerSettingsPanel');
+
+readerSettingsToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  readerSettingsPanel.style.display = readerSettingsPanel.style.display === 'none' ? 'block' : 'none';
+});
+
+// Close panel when clicking outside
+document.addEventListener('click', (e) => {
+  if (readerSettingsPanel.style.display === 'block' &&
+      !readerSettingsPanel.contains(e.target) &&
+      e.target !== readerSettingsToggle) {
+    readerSettingsPanel.style.display = 'none';
+  }
+});
+
+// Font Size
+document.getElementById('fontInc').addEventListener('click', (e) => { e.stopPropagation(); fontSize = Math.min(24, fontSize + 1); applyReaderSettings(); renderPage(currentPage); });
+document.getElementById('fontDec').addEventListener('click', (e) => { e.stopPropagation(); fontSize = Math.max(8, fontSize - 1); applyReaderSettings(); renderPage(currentPage); });
+
+// Theme & Font
+document.querySelectorAll('.settings-btn[data-theme]').forEach(btn => {
+  btn.addEventListener('click', (e) => { e.stopPropagation(); readerTheme = btn.dataset.theme; applyReaderSettings(); });
+});
+document.querySelectorAll('.settings-btn[data-font]').forEach(btn => {
+  btn.addEventListener('click', (e) => { e.stopPropagation(); readerFont = btn.dataset.font; applyReaderSettings(); });
+});
+
+function loadReaderSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('gutenberg:readerSettings'));
+    if (s) {
+      if (s.fontSize) fontSize = s.fontSize;
+      if (s.theme) readerTheme = s.theme;
+      if (s.font) readerFont = s.font;
+    }
+  } catch(e) {}
+  applyReaderSettings();
+}
+
+function applyReaderSettings() {
+  // Save
+  localStorage.setItem('gutenberg:readerSettings', JSON.stringify({ fontSize, theme: readerTheme, font: readerFont }));
+
+  // Apply Theme & Font
+  readerEl.className = `reader-fullscreen theme-${readerTheme} font-${readerFont}`;
+
+  // Update Buttons active state
+  document.querySelectorAll('.settings-btn[data-theme]').forEach(b => b.classList.toggle('active', b.dataset.theme === readerTheme));
+  document.querySelectorAll('.settings-btn[data-font]').forEach(b => b.classList.toggle('active', b.dataset.font === readerFont));
+
+  // Font Size update live
+  if (pageContent) pageContent.style.fontSize = fontSize + 'px';
+}
 
 /* CONTINUE & READ LATER helpers - after page change, these lists update */
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
