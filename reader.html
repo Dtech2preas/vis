@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Reading... — Owami's Library</title>
+<style>
+  :root {
+    /* DTECH X OWAMI THEME */
+    --accent: #00d4ff;        /* Tech Blue */
+    --accent-light: #2979ff;  /* Light Blue */
+    --highlight: #ff007f;     /* Owami Pink */
+    --highlight-glow: rgba(255, 0, 127, 0.4);
+    --text: #e0e0e0;
+    --text-light: #b0b0b0;
+    --muted: #6e6e6e;
+    --background: #0a0a0a;    /* Deep Black */
+    --card-bg: #141414;       /* Dark Gray */
+    --border: #333333;
+
+    --book-font: "Georgia","Times New Roman", serif;
+    --ui-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--text);
+    font-family: var(--ui-font);
+    line-height: 1.5;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden; /* Fullscreen reader */
+  }
+
+  /* READER SPECIFIC STYLES */
+  .reader-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--background);
+    position: relative;
+  }
+
+  /* THEMES */
+  .reader-container.theme-light { --reader-bg: #f0f0f0; --reader-text: #111; --page-bg: #fff; background: var(--reader-bg); color: var(--reader-text); }
+  .reader-container.theme-sepia { --reader-bg: #f4ecd8; --reader-text: #5b4636; --page-bg: #fdfaf6; background: var(--reader-bg); color: var(--reader-text); }
+  .reader-container.theme-dark { --reader-bg: #050505; --reader-text: #b0b0b0; --page-bg: #141414; background: var(--reader-bg); color: var(--reader-text); }
+
+  /* HEADER */
+  .reader-header {
+    height: 60px;
+    background: rgba(20, 20, 20, 0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 10;
+  }
+
+  .reader-container.theme-light .reader-header { background: #e0e0e0; border-bottom: 1px solid #ccc; color: #000; }
+  .reader-container.theme-sepia .reader-header { background: #e8dfc8; border-bottom: 1px solid #d0c6b0; color: #5b4636; }
+
+  .reader-title {
+    font-family: var(--ui-font);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
+    color: var(--highlight); /* Pink Title */
+    text-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+  }
+
+  .back-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .back-btn:hover {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+  }
+
+  .settings-toggle {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: transform 0.3s;
+  }
+  .settings-toggle:hover { transform: rotate(45deg); color: var(--accent); }
+
+  /* READER BODY */
+  .reader-body {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .page-container {
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    padding: 20px 40px; /* More side padding */
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align top */
+    overflow-y: auto; /* Allow vertical scroll if single page overflows slightly, though we paginate */
+  }
+
+  .page {
+    width: 100%;
+    background: transparent;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .page-content {
+    font-family: var(--book-font);
+    line-height: 1.8;
+    text-align: justify;
+    white-space: pre-wrap; /* preserve basic formatting */
+  }
+
+  /* Font classes applied to body */
+  .font-serif .page-content { font-family: "Georgia", "Times New Roman", serif; }
+  .font-sans .page-content { font-family: system-ui, -apple-system, sans-serif; }
+  .font-mono .page-content { font-family: "Courier New", monospace; }
+
+  /* NAVIGATION AREAS */
+  .nav-hit {
+    position: absolute;
+    top: 60px;
+    bottom: 60px;
+    width: 15%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    cursor: pointer;
+  }
+  .nav-hit:hover { opacity: 1; }
+  .nav-hit-left { left: 0; background: linear-gradient(90deg, rgba(0,0,0,0.5), transparent); }
+  .nav-hit-right { right: 0; background: linear-gradient(-90deg, rgba(0,0,0,0.5), transparent); }
+
+  .nav-arrow {
+    font-size: 30px;
+    color: var(--highlight);
+    background: rgba(0,0,0,0.8);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--highlight);
+    box-shadow: 0 0 15px var(--highlight-glow);
+  }
+
+  /* FOOTER / PROGRESS */
+  .reader-footer {
+    padding: 15px 20px;
+    background: rgba(10, 10, 10, 0.9);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    transition: transform 0.3s ease;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+  }
+
+  .reader-footer.hidden {
+    transform: translateY(100%);
+  }
+
+  .reader-progress-bar {
+    width: 100%;
+    max-width: 600px;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .reader-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--highlight);
+    box-shadow: 0 0 10px var(--highlight);
+    transition: width 0.3s ease;
+  }
+
+  .page-indicator {
+    font-size: 12px;
+    color: var(--accent);
+    font-family: monospace;
+    background: rgba(0, 212, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 10px;
+  }
+
+  /* SETTINGS PANEL */
+  .settings-panel {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--highlight); /* Pink border */
+    border-radius: 12px;
+    padding: 16px;
+    width: 260px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    z-index: 50;
+    animation: slideDown 0.2s ease-out;
+  }
+
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .settings-row { margin-bottom: 16px; }
+  .settings-row:last-child { margin-bottom: 0; }
+
+  .settings-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .settings-options { display: flex; gap: 8px; }
+
+  .settings-btn {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-light);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .settings-btn:hover { border-color: var(--highlight); color: var(--highlight); }
+  .settings-btn.active { background: var(--highlight); color: #fff; border-color: var(--highlight); box-shadow: 0 0 10px var(--highlight-glow); }
+
+  /* LOADING */
+  .loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: var(--accent);
+    margin-top: 100px;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0, 212, 255, 0.3);
+    border-top-color: var(--highlight);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Error state */
+  .error-msg {
+    color: #ff4444;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid #ff4444;
+    border-radius: 8px;
+    margin: 40px;
+  }
+</style>
+</head>
+<body class="font-serif">
+
+<div id="app" class="reader-container theme-dark">
+  <div class="reader-header">
+    <a href="index.html" class="back-btn">◀ Library</a>
+    <div class="reader-title" id="bookTitle">Loading Book...</div>
+    <button id="settingsToggle" class="settings-toggle" aria-label="Reader Settings">⚙️</button>
+  </div>
+
+  <div id="settingsPanel" class="settings-panel" style="display:none">
+    <div class="settings-row">
+      <span class="settings-label">Theme</span>
+      <div class="settings-options">
+        <button class="settings-btn" data-theme="light">Light</button>
+        <button class="settings-btn" data-theme="sepia">Sepia</button>
+        <button class="settings-btn active" data-theme="dark">Dark</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Font Family</span>
+      <div class="settings-options">
+        <button class="settings-btn active" data-font="serif">Serif</button>
+        <button class="settings-btn" data-font="sans">Sans</button>
+        <button class="settings-btn" data-font="mono">Mono</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Font Size</span>
+      <div class="settings-options">
+        <button class="settings-btn" id="fontDec">A-</button>
+        <button class="settings-btn" id="fontInc">A+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="reader-body" id="readerBody">
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <div>Fetching your book...</div>
+    </div>
+
+    <div class="page-container" id="pageContainer" style="display:none">
+      <div class="page">
+        <div class="page-content" id="pageContent"></div>
+      </div>
+    </div>
+
+    <div class="nav-hit nav-hit-left" id="navLeft">
+      <div class="nav-arrow">◀</div>
+    </div>
+    <div class="nav-hit nav-hit-right" id="navRight">
+      <div class="nav-arrow">▶</div>
+    </div>
+  </div>
+
+  <div class="reader-footer" id="readerFooter">
+    <div class="reader-progress-bar">
+      <div class="reader-progress-fill" id="progressFill"></div>
+    </div>
+    <div class="page-indicator" id="pageIndicator">Page 0 / 0</div>
+  </div>
+</div>
+
+<script>
+  // CONFIG
+  const PROXY_URL = "https://silent-brook-9ad3.dtech2j.workers.dev/";
+  const PROXY_KEY = "dtech_secret";
+  const WORDS_PER_PAGE_DEFAULT = 500;
+
+  // STATE
+  let pages = [];
+  let currentPage = 0;
+  let fontSize = 18; // Default larger for reader
+  let book = {
+    title: '',
+    url: '',
+    author: '',
+    cover: ''
+  };
+  let footerTimeout;
+
+  // ELEMENTS
+  const app = document.getElementById('app');
+  const pageContent = document.getElementById('pageContent');
+  const pageContainer = document.getElementById('pageContainer');
+  const loader = document.getElementById('loader');
+  const bookTitle = document.getElementById('bookTitle');
+  const progressFill = document.getElementById('progressFill');
+  const pageIndicator = document.getElementById('pageIndicator');
+  const readerFooter = document.getElementById('readerFooter');
+
+  // INIT
+  window.addEventListener('load', init);
+
+  function init() {
+    // 1. Parse Params
+    const params = new URLSearchParams(window.location.search);
+    book.url = params.get('url');
+    book.title = params.get('title') || 'Unknown Title';
+    book.author = params.get('author') || 'Unknown Author';
+    book.cover = params.get('cover') || '';
+
+    if (!book.url) {
+      showError("No book URL provided.");
+      return;
+    }
+
+    bookTitle.textContent = book.title;
+    document.title = `Reading: ${book.title}`;
+
+    // 2. Load Settings
+    loadSettings();
+
+    // 3. Load Content
+    loadBookContent();
+
+    // 4. Setup Event Listeners
+    setupEvents();
+  }
+
+  function setupEvents() {
+    // Navigation
+    document.getElementById('navLeft').addEventListener('click', prevPage);
+    document.getElementById('navRight').addEventListener('click', nextPage);
+
+    // Keyboard
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') nextPage();
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevPage();
+    });
+
+    // Touch / Tap
+    let tx=0;
+    document.addEventListener('touchstart', e => tx = e.touches[0].clientX);
+    document.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx;
+      if (Math.abs(dx) > 50) {
+        if (dx < 0) nextPage(); else prevPage();
+      }
+    });
+
+    // Toggle Footer on click (center area)
+    pageContainer.addEventListener('click', () => {
+      showFooterTemporarily();
+    });
+
+    // Settings
+    const panel = document.getElementById('settingsPanel');
+    const toggle = document.getElementById('settingsToggle');
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
+    document.addEventListener('click', (e) => {
+      if (panel.style.display === 'block' && !panel.contains(e.target) && e.target !== toggle) {
+        panel.style.display = 'none';
+      }
+    });
+
+    // Font Size
+    document.getElementById('fontInc').addEventListener('click', () => changeFontSize(1));
+    document.getElementById('fontDec').addEventListener('click', () => changeFontSize(-1));
+
+    // Theme & Font Family
+    document.querySelectorAll('[data-theme]').forEach(b =>
+      b.addEventListener('click', () => setTheme(b.dataset.theme)));
+    document.querySelectorAll('[data-font]').forEach(b =>
+      b.addEventListener('click', () => setFont(b.dataset.font)));
+  }
+
+  async function loadBookContent() {
+    try {
+      const resp = await fetch(`${PROXY_URL}?url=${encodeURIComponent(book.url)}&key=${encodeURIComponent(PROXY_KEY)}`);
+      if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
+
+      const text = await resp.text();
+      const cleanText = extractPlainText(text);
+      paginateText(cleanText);
+
+      // Restore progress
+      const savedPage = localStorage.getItem(`gutenberg:lastpage:${book.url}`);
+      currentPage = savedPage ? parseInt(savedPage, 10) : 0;
+
+      loader.style.display = 'none';
+      pageContainer.style.display = 'flex';
+      renderPage(currentPage);
+
+    } catch (e) {
+      showError(e.message);
+    }
+  }
+
+  function renderPage(idx) {
+    if (idx < 0) idx = 0;
+    if (idx >= pages.length) idx = pages.length - 1;
+    currentPage = idx;
+
+    pageContent.innerHTML = pages[currentPage];
+    pageContent.style.fontSize = `${fontSize}px`;
+
+    // Update Stats
+    const pct = Math.round(((currentPage + 1) / pages.length) * 100);
+    progressFill.style.width = `${pct}%`;
+    pageIndicator.textContent = `Page ${currentPage + 1} of ${pages.length}`;
+
+    // Save Progress
+    localStorage.setItem(`gutenberg:lastpage:${book.url}`, currentPage);
+    localStorage.setItem(`gutenberg:lastread:${book.url}`, new Date().toISOString());
+    // Also save metadata for "Continue Reading" list in index.html
+    localStorage.setItem(`gutenberg:totalpages:${book.url}`, pages.length);
+
+    // Ensure scrollTop is 0
+    pageContainer.scrollTop = 0;
+
+    showFooterTemporarily();
+  }
+
+  function prevPage() { renderPage(currentPage - 1); }
+  function nextPage() { renderPage(currentPage + 1); }
+
+  function showFooterTemporarily() {
+    readerFooter.classList.remove('hidden');
+    clearTimeout(footerTimeout);
+    footerTimeout = setTimeout(() => {
+      readerFooter.classList.add('hidden');
+    }, 3000);
+  }
+
+  // --- LOGIC FROM INDEX.HTML ADAPTED ---
+
+  function extractPlainText(raw){
+    let s = (raw || '').replace(/\r\n/g, '\n');
+    const U = s.toUpperCase();
+    const startMarkers = ['*** START OF THE PROJECT GUTENBERG EBOOK','*** START OF THIS PROJECT GUTENBERG EBOOK','***START OF THE PROJECT GUTENBERG EBOOK','*** START'];
+    let startIdx = -1;
+    for (const m of startMarkers){ const i = U.indexOf(m); if (i !== -1){ startIdx = i; break; } }
+    if (startIdx !== -1){
+      const after = s.indexOf('\n\n', startIdx);
+      s = (after !== -1) ? s.substring(after + 2) : s.substring(startIdx);
+    } else {
+      s = s.replace(/Title:.*\nAuthor:.*\nRelease date:.*\n/gi,'');
+      s = s.replace(/The Project Gutenberg eBook of [\s\S]*?\n\n/gi, '');
+    }
+    const footerMarkers = ['*** END OF THE PROJECT GUTENBERG EBOOK','*** END OF THIS PROJECT GUTENBERG EBOOK','END OF PROJECT GUTENBERG','END OF THE PROJECT GUTENBERG'];
+    let endIdx = -1;
+    const SU = s.toUpperCase();
+    for (const fm of footerMarkers){ const i = SU.indexOf(fm); if (i !== -1){ endIdx = i; break; } }
+    if (endIdx !== -1) s = s.substring(0, endIdx);
+    s = s.replace(/This ebook is for the use of anyone anywhere[\s\S]*?www\.gutenberg\.org\./gi, '');
+    s = s.replace(/\n{3,}/g, '\n\n').trim();
+    return s;
+  }
+
+  function paginateText(plain) {
+    const paragraphs = plain.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    const result = [];
+    let currentText = '';
+    let wordCount = 0;
+    const LIMIT = WORDS_PER_PAGE_DEFAULT;
+
+    for (let para of paragraphs) {
+      const words = para.split(/\s+/).filter(Boolean);
+      const wCount = words.length;
+
+      if (wordCount + wCount > LIMIT) {
+        if (currentText) {
+          result.push(currentText);
+          currentText = '';
+          wordCount = 0;
+        }
+        if (wCount > LIMIT) {
+          // split long para
+          let remaining = wCount;
+          let sIdx = 0;
+          while (remaining > 0) {
+            const take = Math.min(remaining, LIMIT);
+            result.push(words.slice(sIdx, sIdx + take).join(' '));
+            sIdx += take;
+            remaining -= take;
+          }
+        } else {
+          currentText = para;
+          wordCount = wCount;
+        }
+      } else {
+        currentText = currentText ? (currentText + '\n\n' + para) : para;
+        wordCount += wCount;
+      }
+    }
+    if (currentText) result.push(currentText);
+
+    pages = result.map(pt => {
+      return pt.split(/\n\s*\n/).filter(Boolean).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+    });
+    if (!pages.length) pages = ['<p>No content extracted.</p>'];
+  }
+
+  function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function showError(msg) {
+    loader.style.display = 'none';
+    pageContainer.innerHTML = `<div class="error-msg">${msg}</div>`;
+    pageContainer.style.display = 'flex';
+  }
+
+  // --- SETTINGS LOGIC ---
+  function loadSettings() {
+    try {
+      let s = JSON.parse(localStorage.getItem('gutenberg:readerSettings'));
+      if (s) {
+        if (s.fontSize) fontSize = s.fontSize;
+        if (s.theme) setTheme(s.theme);
+        if (s.font) setFont(s.font);
+      } else {
+        // Defaults
+        setTheme('dark');
+        setFont('serif');
+      }
+    } catch(e) {}
+  }
+
+  function saveSettings(key, val) {
+    let s = {};
+    try { s = JSON.parse(localStorage.getItem('gutenberg:readerSettings')) || {}; } catch(e){}
+    s[key] = val;
+    s.fontSize = fontSize; // always save current size
+    localStorage.setItem('gutenberg:readerSettings', JSON.stringify(s));
+  }
+
+  function changeFontSize(delta) {
+    fontSize = Math.max(12, Math.min(32, fontSize + delta));
+    if (pageContent) pageContent.style.fontSize = `${fontSize}px`;
+    saveSettings('fontSize', fontSize);
+  }
+
+  function setTheme(theme) {
+    app.className = `reader-container theme-${theme}`;
+    document.querySelectorAll('[data-theme]').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
+    saveSettings('theme', theme);
+  }
+
+  function setFont(font) {
+    document.body.className = `font-${font}`;
+    document.querySelectorAll('[data-font]').forEach(b => b.classList.toggle('active', b.dataset.font === font));
+    saveSettings('font', font);
+  }
+
+</script>
+</body>
+</html>
