@@ -583,63 +583,97 @@
     border-color: #ff4444;
   }
 
-  /* VALENTINE MODAL */
-  .valentine-modal {
+  /* GATEKEEPER MODAL */
+  .gatekeeper-modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 100;
+    background: #000;
+    z-index: 200;
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(5px);
+    transition: background-color 0.5s ease;
+    user-select: none; /* Prevent text selection during hold */
   }
 
-  .valentine-card {
-    background: #1a0a10; /* Very dark pinkish black */
-    border: 2px solid var(--highlight);
-    padding: 40px;
-    border-radius: 20px;
+  /* When secret active */
+  .gatekeeper-modal.secret-active {
+    background: var(--highlight); /* Turns pink */
+  }
+
+  .gatekeeper-content {
     text-align: center;
     max-width: 400px;
-    box-shadow: 0 0 50px rgba(255, 0, 127, 0.3);
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 40px;
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    animation: popIn 0.5s ease-out;
+    position: relative;
+    z-index: 201;
   }
 
-  @keyframes popIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
+  @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-  .v-title {
-    font-size: 28px;
-    color: var(--highlight);
-    margin-bottom: 16px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px var(--highlight-glow);
-  }
+  .gk-logo-img { height: 60px; margin-bottom: 20px; border-radius: 8px; }
 
-  .v-msg {
+  .gk-title {
+    font-size: 24px;
     color: var(--text);
-    font-size: 16px;
-    line-height: 1.6;
+    margin: 0 0 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .gk-subtitle {
+    color: var(--muted);
+    font-size: 14px;
     margin-bottom: 30px;
   }
 
-  .v-btn {
-    background: var(--highlight);
-    color: white;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 50px;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 0 20px var(--highlight-glow);
+  .gk-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
   }
-  .v-btn:hover { transform: scale(1.05); background: #ff3399; }
+
+  .gk-btn {
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .gk-btn.primary {
+    background: var(--highlight);
+    color: #fff;
+    box-shadow: 0 0 15px var(--highlight-glow);
+  }
+  .gk-btn.primary:hover { transform: scale(1.02); background: #ff3399; }
+
+  .gk-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-light);
+  }
+  .gk-btn.secondary:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.05); }
+
+  .gk-secret-msg {
+    margin-top: 20px;
+    color: #fff;
+    font-weight: 800;
+    font-size: 18px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    transition: opacity 0.3s;
+  }
 
   /* Toast */
   .toast {
@@ -843,17 +877,37 @@
   </div>
 </div>
 
-<!-- Valentine's Modal -->
-<div id="valentineModal" class="valentine-modal" style="display:none">
-  <div class="valentine-card">
-    <div class="v-title">Happy Valentine's Day!</div>
-    <div class="v-msg">
-      😌I love you ❤️,<br><br>
-🤭N can't wait to vid call you while your at res 😌 😉been thinking about you ever since I started working on the website again 😌you can imagine the thoughts I had 😌n the state am in as I tell you this 😌...I love you once more ❤️ 
-      .<br><br>
-      from yours truely, <br><em>jonas</em>
+<!-- Gatekeeper Modal -->
+<div id="gatekeeperModal" class="gatekeeper-modal" style="display:none">
+  <div class="gatekeeper-content">
+    <div class="gk-logo">
+      <img src="logo.jpg" alt="Logo" class="gk-logo-img" />
     </div>
-    <button class="v-btn" onclick="closeValentine()">Enter Library</button>
+    <h1 class="gk-title">Access Control</h1>
+    <p class="gk-subtitle">Identify yourself to proceed.</p>
+
+    <div class="gk-actions">
+      <button class="gk-btn primary" id="btnEnterOwami">Enter as Owami</button>
+      <button class="gk-btn secondary" id="btnEnterGuest">I am a Random Person</button>
+    </div>
+
+    <div id="gkSecretState" class="gk-secret-msg" style="opacity:0">
+      Double Tap Screen To Unlock
+    </div>
+  </div>
+</div>
+
+<!-- Ad Modal for Guests -->
+<div id="adModal" class="gatekeeper-modal" style="display:none; z-index:300;">
+  <div class="gatekeeper-content">
+    <h2 class="gk-title">Download will start shortly...</h2>
+    <div class="ad-placeholder" style="background:#222; border:1px dashed #444; padding:30px; border-radius:12px; margin:20px 0;">
+      <p style="color:var(--accent); font-weight:bold; font-size:18px; margin-bottom:10px;">✨ SPONSORED ✨</p>
+      <p style="color:var(--text-light);">Support the library by waiting just a moment.</p>
+      <div style="margin-top:20px; font-size:40px;">⏳</div>
+    </div>
+    <p id="adTimer" style="color:var(--highlight); font-weight:bold; font-size:16px; margin-bottom:20px;">Wait 5s...</p>
+    <button id="skipAdBtn" class="gk-btn secondary" disabled>Skip Ad</button>
   </div>
 </div>
 
@@ -1022,25 +1076,116 @@ function renderStats(){
 /* load data.txt and parse */
 window.addEventListener('load', () => {
   loadBooks(false);
-  checkValentine();
+  checkGatekeeper();
 });
 
-/* Valentine's Logic */
-function checkValentine() {
-  const shown = localStorage.getItem('owami_valentine_shown');
-  if (!shown) {
-    document.getElementById('valentineModal').style.display = 'flex';
+/* GATEKEEPER LOGIC */
+let holdTimer;
+let isSecretActive = false;
+const HOLD_DURATION = 5000;
+
+function checkGatekeeper() {
+  const modal = document.getElementById('gatekeeperModal');
+  modal.style.display = 'flex';
+
+  // Reset state
+  isSecretActive = false;
+  modal.classList.remove('secret-active');
+  modal.style.backgroundColor = '';
+  document.getElementById('gkSecretState').style.opacity = '0';
+
+  setupGatekeeperEvents();
+}
+
+function setupGatekeeperEvents() {
+  const modal = document.getElementById('gatekeeperModal');
+  const btnGuest = document.getElementById('btnEnterGuest');
+  const btnOwami = document.getElementById('btnEnterOwami');
+
+  // Button: Guest
+  btnGuest.onclick = () => enterSite('guest');
+
+  // Button: Owami (Trap)
+  btnOwami.onclick = () => {
+    showToast("Nope... lies. You are definitely not Owami.");
+  };
+
+  // Secret Hold
+  modal.onmousedown = startHold;
+  modal.ontouchstart = startHold;
+
+  modal.onmouseup = endHold;
+  modal.ontouchend = endHold;
+  modal.onmouseleave = endHold;
+
+  // Secret Entry
+  modal.ondblclick = (e) => {
+    if (isSecretActive) {
+      enterSite('owami');
+    }
+  };
+}
+
+function startHold(e) {
+  // Ignore if clicking buttons/content, only allow if holding background or general area
+  // Actually, user might hold anywhere. Let's allow holding anywhere EXCEPT the buttons.
+  if (e.target.tagName === 'BUTTON') return;
+
+  const modal = document.getElementById('gatekeeperModal');
+
+  // Start transition to Pink
+  modal.style.transition = `background-color ${HOLD_DURATION}ms linear`;
+  modal.classList.add('secret-active');
+
+  holdTimer = setTimeout(() => {
+    isSecretActive = true;
+    document.getElementById('gkSecretState').style.opacity = '1';
+    // Visual cue that hold is complete (e.g. pulse or something? Pink is already there)
+  }, HOLD_DURATION);
+}
+
+function endHold() {
+  clearTimeout(holdTimer);
+  const modal = document.getElementById('gatekeeperModal');
+
+  if (!isSecretActive) {
+    // If released before 5s, revert immediately
+    modal.style.transition = 'background-color 0.5s ease-out';
+    modal.classList.remove('secret-active');
   }
 }
 
-function closeValentine() {
-  const modal = document.getElementById('valentineModal');
-  modal.style.transition = 'opacity 0.5s';
+function enterSite(type) {
+  localStorage.setItem('gutenberg:userType', type);
+
+  const modal = document.getElementById('gatekeeperModal');
+  modal.style.transition = 'opacity 0.5s ease';
   modal.style.opacity = '0';
+
   setTimeout(() => {
     modal.style.display = 'none';
-    localStorage.setItem('owami_valentine_shown', 'true');
+    modal.style.opacity = '1'; // Reset for next time
+    updateInterfaceForUser(type);
   }, 500);
+}
+
+function updateInterfaceForUser(type) {
+  const brandText = document.querySelector('.brand-text');
+  const title = document.querySelector('title');
+  const userType = type || 'guest';
+
+  if (userType === 'guest') {
+    brandText.innerHTML = `<em>Public</em> Library <span class="dtech-badge">Dtech</span>`;
+    title.textContent = "Public Library — Dtech Collection";
+    showToast("Entered as Guest");
+  } else if (userType === 'owami') {
+    brandText.innerHTML = `<em>Owami's</em> Library <span class="dtech-badge">Dtech</span>`;
+    title.textContent = "Owami's Library — Dtech Collection";
+    showToast("Welcome home, Owami ✨");
+  }
+
+  // Re-render books to update download buttons (if any)
+  renderHomePage();
 }
 
 /* INDEXEDDB FUNCTIONS */
@@ -1401,10 +1546,17 @@ function createBookCard(book) {
   addBtn.title = 'Add to Collection';
   addBtn.addEventListener('click', (e)=>{ e.stopPropagation(); addToCollection(book); });
 
+  const dlBtn = document.createElement('button');
+  dlBtn.className='small-btn';
+  dlBtn.innerHTML = '⬇️';
+  dlBtn.title = 'Download Book';
+  dlBtn.addEventListener('click', (e)=>{ e.stopPropagation(); handleDownload(book); });
+
   row.appendChild(readBtn); 
   row.appendChild(rlBtn);
   row.appendChild(favBtn);
   row.appendChild(addBtn);
+  row.appendChild(dlBtn);
   card.appendChild(coverWrap); 
   card.appendChild(title); 
   card.appendChild(author); 
@@ -1818,6 +1970,71 @@ function formatDate(dateString) {
   else if (diffDays === 1) return 'Yesterday';
   else if (diffDays < 7) return `${diffDays} days ago`;
   else return date.toLocaleDateString();
+}
+
+/* DOWNLOAD LOGIC */
+function handleDownload(book) {
+  const userType = localStorage.getItem('gutenberg:userType') || 'guest';
+  if (userType === 'owami') {
+    startDownload(book);
+  } else {
+    showAdModal(book);
+  }
+}
+
+function showAdModal(book) {
+  const modal = document.getElementById('adModal');
+  const timerEl = document.getElementById('adTimer');
+  const skipBtn = document.getElementById('skipAdBtn');
+
+  modal.style.display = 'flex';
+  skipBtn.disabled = true;
+  skipBtn.textContent = 'Wait...';
+
+  let timeLeft = 5;
+  timerEl.textContent = `Download starts in ${timeLeft}s...`;
+
+  const interval = setInterval(() => {
+    timeLeft--;
+    if (timeLeft > 0) {
+      timerEl.textContent = `Download starts in ${timeLeft}s...`;
+    } else {
+      clearInterval(interval);
+      timerEl.textContent = "Thanks for waiting!";
+      skipBtn.disabled = false;
+      skipBtn.textContent = "Download Now";
+      skipBtn.onclick = () => {
+        modal.style.display = 'none';
+        startDownload(book);
+      };
+      // Auto download?
+      // setTimeout(() => { modal.style.display = 'none'; startDownload(book); }, 1000);
+    }
+  }, 1000);
+}
+
+async function startDownload(book) {
+  showToast(`Downloading: ${shortTitle(book.title)}...`);
+
+  const PROXY = "https://silent-brook-9ad3.dtech2j.workers.dev/";
+  const KEY = "dtech_secret";
+  const url = `${PROXY}?url=${encodeURIComponent(book.textUrl)}&key=${KEY}`;
+
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('Download failed');
+    const blob = await resp.blob();
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = `${book.title}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("Download started!");
+  } catch (e) {
+    console.error(e);
+    showToast("Error downloading file.");
+  }
 }
 
 /* OPEN BOOK - REDIRECT TO READER.HTML */
