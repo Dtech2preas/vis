@@ -1,0 +1,118 @@
+# Owami's Library — Dtech Collection
+
+## Overview (For Everyone)
+
+**What is it?**
+Owami's Library is a web-based e-book reader and library management application. It allows users to browse, search, organize, and read thousands of public domain books (primarily from Project Gutenberg) directly in their web browser without needing any extra software or apps.
+
+**What is it for?**
+It is designed to provide a seamless, beautiful, and distraction-free reading experience across both desktop and mobile devices. It offers features commonly found in premium reading apps, all running locally and directly in your browser.
+
+**Key Features:**
+- **Vast Library:** Browse books intuitively organized by genre.
+- **Smart Search & Filtering:** Quickly find books by title, author, or genre.
+- **Personalization:** Save books to "Read Later", mark as "Favorites", or organize them into custom "Collections".
+- **Distraction-Free Reader:** A dedicated reading mode with customizable fonts, text sizes, and themes (Light, Sepia, Dark).
+- **Progress Tracking:** The app automatically remembers where you left off. The "Continue Reading" section shows your exact page and percentage.
+- **Reading Stats:** Tracks your time spent reading, pages turned, and books opened.
+- **Offline & Cache Support:** Loads significantly faster on subsequent visits by caching library data directly on your device.
+- **Download Capability:** Save books directly to your device as text files.
+- **Access Control (Gatekeeper):** A fun, secret entry system distinguishing between "Owami" and "Guest" users. Guest users see a mock ad delay before downloading, while the authorized user gets instant access.
+
+**How does it work?**
+When you open the site, it downloads a catalog of books. You can click on any book to open the reader. The reader fetches the book's text from the internet on-the-fly, formats it into "pages", and lets you read it like a real book. Everything you save—your favorites, your reading progress, your settings—is stored locally on your device, ensuring total privacy and speed.
+
+---
+
+## Technical Architecture & Deep Dive (For Developers)
+
+Owami's Library is a static Single Page Application (SPA) conceptually spread across two HTML pages (`index.html` for the library, `reader.html` for reading), backed by a serverless Cloudflare Worker (`worker.js`) acting as a CORS proxy.
+
+### System Flow & State Management
+- **Frontend Framework:** Vanilla HTML, CSS, and JavaScript. No heavy frameworks (like React or Vue) are used, ensuring maximum performance, rapid load times, and a minimal footprint.
+- **Data Source:** The book catalog is loaded from a static `data.txt` file, which contains text-based metadata (title, author, genre, text URL, cover image URL) that is parsed on the client side.
+- **State Management:**
+  - `localStorage`: Used for persisting user preferences (theme, font settings), user state (Guest vs Owami), library collections (Favorites, Read Later, Custom Collections), and reading progress (last page, total pages, timestamps).
+  - `IndexedDB`: Used for caching the large book catalog (`data.txt` parsed into an array of JSON objects) to prevent re-fetching and re-parsing a large text file on every visit.
+- **Proxying & CORS:** Web browsers block fetching cross-origin text files directly (like fetching Gutenberg plain text files from another domain) due to security policies. To solve this, the app uses a Cloudflare Worker (`worker.js`). The frontend asks the Worker for the book URL, and the Worker fetches it from the source and returns it to the frontend with the proper `Access-Control-Allow-Origin: *` headers.
+- **Pagination Algorithm:** In `reader.html`, raw plain text from Gutenberg is stripped of boilerplate and split into "pages" dynamically based on a fixed word count. This creates a paginated, book-like feel instead of an endless scrolling text wall.
+
+---
+
+## File Breakdown
+
+### 1. `index.html` (The Library View)
+
+**Role:** The main hub for browsing, searching, and managing the library.
+
+**Key Components & Logic:**
+- **UI & Layout:**
+  - A responsive CSS Grid/Flexbox layout.
+  - Desktop view uses a top navigation bar with tabs.
+  - Mobile view (< 768px) hides the top tabs and displays a fixed bottom navigation bar for better ergonomics.
+  - Styled with a strict "Dtech x Owami" theme utilizing CSS variables (deep blacks, tech blues, and highlight pinks).
+- **Tab Navigation (SPA-like routing):** JavaScript functions hide and show different section `div`s (`#homeSection`, `#continueSection`, etc.) based on the active tab without ever reloading the page.
+- **Data Loading (`loadBooks`):**
+  - Attempts to load the parsed book array from `IndexedDB` first.
+  - If empty or forced to refresh, it fetches `data.txt` via the Streams API to show a real-time loading progress bar.
+  - Data is processed in chunks (`processDataChunk`) to avoid locking the UI thread. It uses regex to extract book details, pushes them to an array, and finally saves the result to `IndexedDB`.
+- **Search & Filter:** Implements a debounced search listener to filter the loaded array of objects by title, author, and genre efficiently.
+- **Gatekeeper Modal:** An initial modal forcing users to identify themselves. Holding the background triggers a transition, and double-tapping sets the user state in local storage to "owami", altering the branding and bypassing ad timers for downloads.
+- **Collections Management:** Functions to create, update, and delete arrays of book objects saved to `localStorage` under keys like `gutenberg:readlater`, `gutenberg:favorites`, and `gutenberg:collections`.
+- **Download Handling:** Guests clicking download face a fake 5-second ad timer modal. "Owami" bypasses this. Downloads trigger the Cloudflare Worker to fetch the file, convert it to a Blob, and trigger a local browser download via an ephemeral object URL.
+
+### 2. `reader.html` (The Reader View)
+
+**Role:** The isolated, distraction-free reading environment. Opened via URL parameters passed from `index.html` (e.g., `reader.html?url=...&title=...`).
+
+**Key Components & Logic:**
+- **URL Parameter Parsing:** On initialization, it reads `window.location.search` to know which book text URL to fetch and what metadata to display.
+- **Fetching Text:** Calls the `worker.js` proxy with the book's URL.
+- **Text Processing & Pagination (`extractPlainText` & `paginateText`):**
+  - `extractPlainText`: Uses string manipulation and indexOf checks to strip out standard Project Gutenberg headers, footers, and license text to isolate the actual story.
+  - `paginateText`: Splits the cleaned text into arrays of paragraphs, grouping them into "pages" based on an approximate word count limit (`WORDS_PER_PAGE_DEFAULT`).
+- **Rendering & Progress:**
+  - Displays the current index of the `pages` array by injecting HTML into the DOM.
+  - Saves the current index to `localStorage` (`gutenberg:lastpage:<url>`) every time the page turns.
+- **Navigation:** Supports clicking side hitboxes, swiping horizontally on touch devices, and using keyboard arrow keys.
+- **Settings Panel:** Allows toggling CSS classes on the `<body>` and `#app` container to change themes (Light, Sepia, Dark) and typography (Serif, Sans, Mono). Font size increments/decrements adjust the inline style of the text container.
+- **Stats Tracking:** Periodically increments `totalTime` in `localStorage` while the document visibility state is 'visible'.
+
+### 3. `worker.js` (The Cloudflare Worker Proxy)
+
+**Role:** The backend proxy to bypass browser CORS restrictions and optionally cache responses at the edge.
+
+**Key Components & Logic:**
+- **Event Listener:** Intercepts incoming `fetch` events deployed on Cloudflare.
+- **Authentication:** Requires a specific `key` query parameter (`dtech_secret`) to prevent public abuse of the proxy endpoint.
+- **CORS Handling:** Responds to `OPTIONS` preflight requests immediately with standard CORS headers. Appends `Access-Control-Allow-Origin: *` to successful GET responses.
+- **Size Limitation:** Checks the `Content-Length` header and array buffer byte length, rejecting files larger than 5MB to prevent memory exhaustion or bandwidth abuse.
+- **Edge Caching:** Checks the Cloudflare Cache API (`caches.default`) before fetching from the upstream target. If fetched successfully, it stores the response in the cache with a TTL of 1 day (`86400` seconds), ensuring repeated reads of the same book are lightning fast globally.
+
+### 4. `data.txt`
+
+**Role:** The static database file containing the catalog of books.
+
+**Structure:**
+The file follows a specific, human-readable text format parsed by regex chunking in `index.html`:
+```text
+🎯 GENRE: Fiction
+📖 BOOK 1: A Tale of Two Cities
+👤 Author: Charles Dickens
+📝 Text URL: https://www.gutenberg.org/files/98/98-0.txt
+🖼️ Cover: https://www.gutenberg.org/cache/epub/98/pg98.cover.medium.jpg
+------------------------
+```
+This simple format allows for easy manual updates while remaining machine-readable for the frontend parser.
+
+---
+
+## Request Flow Summary
+
+1. **Initial Load:** User hits `index.html`.
+2. **Catalog Fetch:** `index.html` checks `IndexedDB`. If empty, it fetches `data.txt` directly from the same host, parses it, and populates the UI and cache.
+3. **Open Book:** User clicks "Read". Browser navigates to `reader.html?url=<Gutenberg_URL>`.
+4. **Proxy Fetch:** `reader.html` sends `fetch('https://silent-brook.../?url=<Gutenberg_URL>&key=dtech_secret')`.
+5. **Worker Proxy:** `worker.js` receives the request. Checks its edge cache. If miss, fetches `<Gutenberg_URL>`.
+6. **Worker Response:** Worker attaches CORS headers, caches the response, and returns the text to `reader.html`.
+7. **Process & Render:** `reader.html` strips boilerplate headers, chunks the large text string into pages, retrieves any saved page index from `localStorage`, and displays the content to the user.
